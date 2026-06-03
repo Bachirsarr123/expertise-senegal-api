@@ -49,7 +49,7 @@ const Contact = () => {
 
   const fetchParamsAndContent = async () => {
     try {
-      const paramsRes = await axios.get('http://localhost:5000/api/content/parametres');
+      const paramsRes = await axios.get('https://expertise-senegal-api.onrender.com/api/content/parametres');
       const params = paramsRes.data;
       if (params) {
         if (params.contact_phone) setPhone(params.contact_phone);
@@ -66,7 +66,7 @@ const Contact = () => {
         if (params.hours_sun) setHoursSun(params.hours_sun);
       }
 
-      const contentRes = await axios.get('http://localhost:5000/api/content/all');
+      const contentRes = await axios.get('https://expertise-senegal-api.onrender.com/api/content/all');
       if (contentRes && contentRes.data && contentRes.data.domaines && contentRes.data.domaines.domaine4 && contentRes.data.domaines.domaine4.themes) {
         setThemes(contentRes.data.domaines.domaine4.themes);
       }
@@ -126,7 +126,7 @@ const Contact = () => {
 
     try {
       // Submit to Backend Node.js express route
-      await axios.post('http://localhost:5000/api/messages', {
+      await axios.post('https://expertise-senegal-api.onrender.com/api/messages', {
         nom: `${formData.prenom} ${formData.nom}`,
         email: formData.email,
         telephone: formData.telephone,

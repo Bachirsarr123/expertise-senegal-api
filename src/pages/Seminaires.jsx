@@ -17,7 +17,7 @@ const Seminaires = () => {
 
   const fetchPublications = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/api/publications/public');
+      const response = await axios.get('https://expertise-senegal-api.onrender.com/api/publications/public');
       setPublications(response.data);
       setLoading(false);
     } catch (error) {

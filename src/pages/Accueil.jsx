@@ -15,7 +15,7 @@ const Accueil = () => {
 
   const fetchAnnonces = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/api/publications/public');
+      const response = await axios.get('https://expertise-senegal-api.onrender.com/api/publications/public');
       if (response.data.length > 0) {
         setSpotlight(response.data[0]); // The latest publication goes in full spotlight at the top
         setAnnonces(response.data.slice(1, 4)); // The subsequent go in the bottom card grid

@@ -18,7 +18,7 @@ const Login = () => {
 
     try {
       // Connect to our express server on PORT 5000
-      const response = await axios.post('http://localhost:5000/api/auth/login', {
+      const response = await axios.post('https://expertise-senegal-api.onrender.com/api/auth/login', {
         login,
         password
       });

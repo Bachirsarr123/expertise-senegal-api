@@ -89,7 +89,7 @@ const GestionMedias = ({ triggerToast, triggerConfirm, onMediaAction }) => {
   };
 
   const handleCopyLink = (chemin) => {
-    const fullLink = `http://localhost:5000${chemin}`;
+    const fullLink = `https://expertise-senegal-api.onrender.com${chemin}`;
     navigator.clipboard.writeText(fullLink);
     triggerToast('Lien de la photo copié dans le presse-papiers !');
   };
@@ -137,7 +137,7 @@ const GestionMedias = ({ triggerToast, triggerConfirm, onMediaAction }) => {
         ) : (
           <div className="medias-grid">
             {medias.map(media => {
-              const fullUrl = `http://localhost:5000${media.chemin}`;
+              const fullUrl = `https://expertise-senegal-api.onrender.com${media.chemin}`;
 
               return (
                 <div key={media.id} className="media-item-card">
