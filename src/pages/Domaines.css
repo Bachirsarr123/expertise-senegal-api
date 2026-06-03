@@ -1,0 +1,215 @@
+/* Utilitaires spécifiques Domaines */
+.mt-2 { margin-top: 0.5rem; }
+.mt-4 { margin-top: 1.5rem; }
+.mt-5 { margin-top: 3rem; }
+.mb-5 { margin-bottom: 3rem; }
+
+.bg-white { background-color: var(--blanc); }
+.bg-light { background-color: var(--gris-clair); }
+.bg-dark { background-color: var(--bleu-marine); }
+
+.text-white { color: var(--blanc) !important; }
+.text-white-opacity { color: rgba(255, 255, 255, 0.85); }
+.text-gold { color: var(--or); }
+
+.label-gold {
+  color: var(--or);
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  font-size: 0.9rem;
+  display: block;
+}
+
+/* 1. HERO DE PAGE */
+.domaines-hero {
+  background-color: var(--bleu-marine);
+  padding: 100px 0 80px 0;
+  color: var(--blanc);
+  text-align: center;
+}
+.domaines-hero-content {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+/* DOMAINES LAYOUTS */
+.domaine-container {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+}
+
+.domaine-title {
+  color: var(--bleu-marine);
+  font-size: 2rem;
+  font-weight: 800;
+  margin-bottom: 1.5rem;
+}
+
+.domaine-intro {
+  font-size: 1.15rem;
+  line-height: 1.6;
+  margin-bottom: 2rem;
+  color: var(--texte-moyen);
+}
+
+.domaine-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.domaine-list li {
+  position: relative;
+  padding-left: 30px;
+  font-size: 1.05rem;
+  color: var(--texte-fonce);
+  line-height: 1.5;
+}
+
+.domaine-list li::before {
+  content: '✅';
+  position: absolute;
+  left: 0;
+  top: 2px;
+  font-size: 1rem;
+}
+
+.list-white li {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+/* RÉFÉRENCES (CARDS) */
+.ref-card {
+  background-color: var(--gris-clair);
+  padding: 30px;
+  border-radius: 12px;
+  border-left: 4px solid var(--or);
+}
+
+.ref-card.dark-mode {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.ref-title {
+  color: var(--bleu-marine);
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin-bottom: 20px;
+}
+
+.ref-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.ref-list li {
+  position: relative;
+  padding-left: 20px;
+  font-size: 0.95rem;
+  color: var(--texte-moyen);
+  line-height: 1.5;
+}
+
+.ref-list li::before {
+  content: '•';
+  position: absolute;
+  left: 0;
+  top: 0;
+  color: var(--or);
+  font-weight: bold;
+  font-size: 1.2rem;
+}
+
+.ref-list li strong {
+  color: var(--texte-fonce);
+}
+
+/* DOMAINE 4 SPECIFICS */
+.formats-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 20px;
+}
+
+.format-card {
+  background-color: var(--blanc);
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(0,0,0,0.05);
+}
+
+.format-icon {
+  font-size: 2rem;
+  margin-bottom: 10px;
+}
+
+.format-card h4 {
+  color: var(--bleu-marine);
+  font-size: 1.1rem;
+  margin-bottom: 8px;
+}
+
+.format-card p {
+  color: var(--texte-moyen);
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+.themes-title {
+  font-size: 1.2rem;
+  color: var(--bleu-marine);
+  margin-bottom: 15px;
+}
+
+.themes-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.theme-badge {
+  background-color: var(--or);
+  color: var(--blanc);
+  padding: 8px 16px;
+  border-radius: 50px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  box-shadow: 0 4px 6px rgba(201, 149, 42, 0.2);
+}
+
+/* RESPONSIVE */
+@media (min-width: 768px) {
+  .domaines-hero {
+    padding: 140px 0 100px 0;
+  }
+  
+  .domaine-container {
+    flex-direction: row;
+    align-items: center;
+  }
+  
+  .domaine-container.reverse-layout {
+    flex-direction: row-reverse;
+  }
+  
+  .layout-60 {
+    width: 60%;
+  }
+  
+  .layout-40 {
+    width: 40%;
+  }
+  
+  .formats-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .domaine-container {
+    gap: 60px;
+  }
+}

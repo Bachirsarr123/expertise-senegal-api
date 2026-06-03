@@ -1,0 +1,110 @@
+:root {
+  --bleu-marine: #1a2456;
+  --or: #C9952A;
+  --blanc: #FFFFFF;
+  --gris-clair: #F5F5F5;
+  --texte-fonce: #333333;
+  --texte-moyen: #666666;
+  --footer-bg: #111827;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+  font-family: 'Inter', system-ui, Avenir, Helvetica, Arial, sans-serif;
+}
+
+body {
+  margin: 0;
+  background-color: var(--blanc);
+  color: var(--texte-fonce);
+  line-height: 1.6;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+ul {
+  list-style: none;
+}
+
+button {
+  cursor: pointer;
+  font-family: inherit;
+}
+
+/* Utilitaires globaux */
+.container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.btn {
+  display: inline-block;
+  padding: 12px 24px;
+  font-weight: 600;
+  border-radius: 4px;
+  transition: all 0.3s ease;
+  border: none;
+  text-align: center;
+}
+
+.btn-primary {
+  background-color: var(--or);
+  color: var(--blanc);
+}
+
+.btn-primary:hover {
+  background-color: #b08224;
+}
+
+.btn-outline {
+  background-color: transparent;
+  color: var(--blanc);
+  border: 2px solid var(--blanc);
+}
+
+.btn-outline:hover {
+  background-color: var(--blanc);
+  color: var(--bleu-marine);
+}
+
+.btn-secondary {
+  background-color: var(--bleu-marine);
+  color: var(--blanc);
+}
+
+.btn-secondary:hover {
+  background-color: #12193b;
+}
+
+.section-padding {
+  padding: 80px 0;
+}
+
+.section-title {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 2rem;
+  text-align: center;
+  color: var(--bleu-marine);
+}
+
+@media (min-width: 768px) {
+  .section-padding {
+    padding: 100px 0;
+  }
+  
+  .section-title {
+    font-size: 2.5rem;
+  }
+}

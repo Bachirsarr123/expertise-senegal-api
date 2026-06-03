@@ -1,0 +1,141 @@
+.footer {
+  background-color: var(--footer-bg);
+  color: #D1D5DB;
+  padding-top: 60px;
+}
+
+.footer-content {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 40px;
+  margin-bottom: 40px;
+}
+
+.footer-col {
+  display: flex;
+  flex-direction: column;
+}
+
+.brand-col {
+  max-width: 400px;
+}
+
+.footer-logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.logo-container-footer {
+  background-color: var(--blanc);
+  padding: 6px 12px;
+  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+  transition: transform 0.3s ease;
+}
+
+.logo-container-footer:hover {
+  transform: scale(1.03);
+}
+
+.footer-logo-img {
+  height: 40px;
+  width: auto;
+  object-fit: contain;
+  display: block;
+}
+
+.footer-desc {
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+.footer-heading {
+  color: var(--blanc);
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 20px;
+  position: relative;
+  padding-bottom: 10px;
+}
+
+.footer-heading::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 40px;
+  height: 2px;
+  background-color: var(--or);
+}
+
+.footer-links {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.footer-links a {
+  transition: color 0.3s ease;
+}
+
+.footer-links a:hover {
+  color: var(--or);
+}
+
+.footer-contact-info {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.footer-contact-info li {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.footer-contact-info .icon {
+  font-size: 1.2rem;
+  line-height: 1.2;
+}
+
+.footer-contact-info a:hover {
+  color: var(--or);
+  text-decoration: underline;
+}
+
+.footer-bottom {
+  background-color: #0B0F19;
+  padding: 20px 0;
+  text-align: center;
+  font-size: 0.9rem;
+  position: relative;
+}
+
+.admin-trigger {
+  opacity: 0.08;
+  font-size: 18px;
+  cursor: pointer;
+  color: #ffffff;
+  user-select: none;
+  position: absolute;
+  bottom: 8px;
+  right: 15px;
+  padding: 5px;
+  transition: opacity 0.3s ease;
+}
+
+.admin-trigger:hover {
+  opacity: 0.6;
+}
+
+@media (min-width: 768px) {
+  .footer-content {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}

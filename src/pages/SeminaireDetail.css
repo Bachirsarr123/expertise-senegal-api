@@ -1,0 +1,271 @@
+.pub-detail-page {
+  font-family: 'Inter', sans-serif;
+}
+
+/* Hero Banner */
+.pub-detail-banner {
+  background-size: cover;
+  background-position: center;
+  position: relative;
+  padding: 120px 0 80px 0;
+  color: var(--blanc);
+}
+
+.pub-detail-banner-content {
+  position: relative;
+  z-index: 2;
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.back-link {
+  color: var(--or);
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.9rem;
+  display: inline-block;
+  margin-bottom: 25px;
+  transition: transform 0.2s ease;
+}
+
+.back-link:hover {
+  transform: translateX(-4px);
+}
+
+.pub-detail-badge {
+  display: inline-block;
+  padding: 5px 12px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--blanc);
+  margin-bottom: 20px;
+}
+
+.pub-detail-banner h1 {
+  font-size: 2.5rem;
+  font-weight: 800;
+  line-height: 1.25;
+  margin-bottom: 15px;
+}
+
+.pub-banner-desc {
+  font-size: 1.15rem;
+  opacity: 0.9;
+  line-height: 1.6;
+  max-width: 800px;
+}
+
+/* Main Content & Form Grid Layout */
+.pub-detail-layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 40px;
+  align-items: start;
+}
+
+@media (min-width: 1024px) {
+  .pub-detail-layout {
+    grid-template-columns: 1.8fr 1.2fr;
+  }
+}
+
+/* Left Column: Metadata boxes */
+.pub-meta-box {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+  background-color: var(--gris-clair);
+  border: 1px solid rgba(26, 36, 86, 0.08);
+  border-radius: 12px;
+  padding: 24px;
+  margin-bottom: 35px;
+}
+
+@media (min-width: 768px) {
+  .pub-meta-box {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.meta-box-item {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.meta-icon {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--texte-moyen);
+}
+
+.meta-val {
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--bleu-marine);
+}
+
+/* Left Column: Content Description text */
+.pub-main-text {
+  background-color: var(--blanc);
+  border-radius: 12px;
+  padding: 30px;
+  border: 1px solid rgba(26, 36, 86, 0.05);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
+}
+
+.content-h2 {
+  font-size: 1.5rem;
+  font-weight: 800;
+  margin-bottom: 25px;
+  border-left: 4px solid var(--or);
+  padding-left: 15px;
+  color: var(--bleu-marine);
+}
+
+.formatted-content p {
+  font-size: 1.02rem;
+  line-height: 1.7;
+  color: var(--texte-moyen);
+  margin-bottom: 20px;
+}
+
+/* Right Column: Sticky form card */
+.pub-registration-card {
+  background-color: var(--blanc);
+  border-radius: 12px;
+  padding: 30px;
+  border: 1px solid rgba(26, 36, 86, 0.08);
+  box-shadow: 0 10px 40px rgba(26, 36, 86, 0.05);
+}
+
+.sticky-sidebar {
+  position: static;
+}
+
+@media (min-width: 1024px) {
+  .sticky-sidebar {
+    position: sticky;
+    top: 100px;
+  }
+}
+
+.pub-registration-card h3 {
+  font-size: 1.35rem;
+  font-weight: 750;
+  color: var(--bleu-marine);
+  margin-bottom: 8px;
+}
+
+.card-subtitle {
+  font-size: 0.88rem;
+  color: var(--texte-moyen);
+  margin-bottom: 24px;
+  line-height: 1.4;
+}
+
+/* Registration Form Controls */
+.registration-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.form-group-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.form-item {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.form-item label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--bleu-marine);
+}
+
+.form-item input,
+.form-item textarea {
+  padding: 10px 14px;
+  border-radius: 6px;
+  border: 1px solid #D1D5DB;
+  font-family: inherit;
+  font-size: 0.95rem;
+  color: var(--bleu-marine);
+  transition: all 0.2s ease;
+}
+
+.form-item input:focus,
+.form-item textarea:focus {
+  outline: none;
+  border-color: var(--or);
+  box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.15);
+}
+
+.btn-disabled {
+  background-color: #E5E7EB !important;
+  color: #9CA3AF !important;
+  border-color: #E5E7EB !important;
+  cursor: not-allowed !important;
+  box-shadow: none !important;
+}
+
+/* Separator */
+.form-separator {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  color: var(--texte-moyen);
+  margin: 20px 0;
+  font-size: 0.85rem;
+}
+
+.form-separator::before,
+.form-separator::after {
+  content: '';
+  flex: 1;
+  border-bottom: 1px solid #E5E7EB;
+}
+
+.form-separator:not(:empty)::before {
+  margin-right: 15px;
+}
+
+.form-separator:not(:empty)::after {
+  margin-left: 15px;
+}
+
+/* WhatsApp action button */
+.btn-whatsapp-direct {
+  background-color: #25D366;
+  color: var(--blanc);
+  border: 1px solid #25D366;
+  box-shadow: 0 4px 12px rgba(37, 211, 102, 0.2);
+  font-weight: 700;
+  padding: 12px 20px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.95rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.3s ease;
+}
+
+.btn-whatsapp-direct:hover {
+  background-color: #20BA5A;
+  border-color: #20BA5A;
+  box-shadow: 0 6px 20px rgba(37, 211, 102, 0.3);
+  transform: translateY(-2px);
+}

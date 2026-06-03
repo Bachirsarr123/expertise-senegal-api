@@ -1,0 +1,175 @@
+/* Utilitaires spécifiques APropos */
+.mb-5 {
+  margin-bottom: 3rem;
+}
+.mt-2 {
+  margin-top: 0.5rem;
+}
+.bg-white {
+  background-color: var(--blanc);
+}
+.fw-bold {
+  font-weight: 700;
+}
+.img-fluid {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+.rounded {
+  border-radius: 12px;
+}
+.shadow {
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+.label-gold {
+  color: var(--or);
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  font-size: 0.9rem;
+}
+
+/* 1. HERO DE PAGE */
+.apropos-hero {
+  background-color: var(--bleu-marine);
+  padding: 100px 0 80px 0;
+  color: var(--blanc);
+  text-align: center;
+}
+.apropos-hero-content {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+/* 2. PRÉSENTATION GÉNÉRALE */
+.presentation-content {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+  align-items: center;
+}
+.presentation-text p {
+  color: var(--texte-moyen);
+  font-size: 1.1rem;
+  margin-bottom: 1.5rem;
+}
+
+/* 3. NOTRE VISION */
+.vision-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 20px;
+}
+.vision-card {
+  background-color: var(--blanc);
+  padding: 30px;
+  border-radius: 8px;
+  border-left: 4px solid var(--or);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+  display: flex;
+  align-items: flex-start;
+  gap: 20px;
+  transition: transform 0.3s ease;
+}
+.vision-card:hover {
+  transform: translateX(5px);
+}
+.vision-icon {
+  font-size: 2rem;
+  flex-shrink: 0;
+}
+.vision-card p {
+  color: var(--texte-fonce);
+  font-weight: 500;
+  margin: 0;
+  font-size: 1.05rem;
+  align-self: center;
+}
+
+/* 4. NOS ATOUTS */
+.atouts-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 30px;
+}
+.atout-card {
+  background-color: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 40px 30px;
+  border-radius: 12px;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+.atout-card:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  border-color: var(--or);
+  transform: translateY(-5px);
+}
+.atout-icon {
+  font-size: 3rem;
+  margin-bottom: 20px;
+}
+.atout-title {
+  color: var(--blanc);
+  font-size: 1.25rem;
+  margin-bottom: 15px;
+}
+.atout-desc {
+  color: #D1D5DB;
+  font-size: 0.95rem;
+}
+
+/* 5. DONNÉES ADMINISTRATIVES */
+.admin-table-container {
+  max-width: 800px;
+  margin: 0 auto;
+  background-color: var(--blanc);
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+  border: 1px solid rgba(0,0,0,0.05);
+}
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.admin-table tr:not(:last-child) {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+.admin-table td {
+  padding: 20px;
+  vertical-align: middle;
+}
+.admin-icon {
+  width: 60px;
+  text-align: center;
+  font-size: 1.5rem;
+  background-color: var(--gris-clair);
+}
+.admin-label {
+  width: 30%;
+  color: var(--texte-moyen);
+  font-weight: 500;
+}
+.admin-value {
+  color: var(--texte-fonce);
+}
+
+/* RESPONSIVE */
+@media (min-width: 768px) {
+  .apropos-hero {
+    padding: 140px 0 100px 0;
+  }
+  .presentation-content {
+    flex-direction: row;
+  }
+  .presentation-text, .presentation-image {
+    flex: 1;
+  }
+  .vision-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .atouts-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}

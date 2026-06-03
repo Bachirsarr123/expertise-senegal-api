@@ -1,0 +1,326 @@
+/* Utilitaires et Bases */
+.text-left {
+  text-align: left;
+}
+.fw-semibold {
+  font-weight: 600;
+}
+.text-red {
+  color: #dc2626;
+  font-weight: 600;
+}
+.max-width-600 {
+  max-width: 600px;
+  margin: 0 auto;
+}
+.mt-2 { margin-top: 0.5rem; }
+.mt-4 { margin-top: 1.5rem; }
+.mt-5 { margin-top: 3rem; }
+.mb-5 { margin-bottom: 3rem; }
+
+/* 1. HERO DE PAGE */
+.contact-hero {
+  background-color: var(--bleu-marine);
+  padding: 100px 0 80px 0;
+  color: var(--blanc);
+  text-align: center;
+}
+.contact-hero-content {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+/* 2. SECTION PRINCIPALE */
+.contact-container {
+  display: flex;
+  flex-direction: column;
+  gap: 50px;
+}
+
+/* Colonne Gauche - Coordonnées */
+.contact-info-col {
+  flex: 1;
+}
+
+.coord-list {
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+  margin-top: 30px;
+}
+
+.coord-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 15px;
+}
+
+.coord-icon {
+  font-size: 1.7rem;
+  background-color: var(--gris-clair);
+  width: 50px;
+  height: 50px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 50%;
+  flex-shrink: 0;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+}
+
+.coord-details h4 {
+  font-size: 1rem;
+  color: var(--bleu-marine);
+  margin-bottom: 5px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.coord-details p {
+  color: var(--texte-moyen);
+  line-height: 1.5;
+  margin: 0;
+}
+
+.coord-details a {
+  color: var(--or);
+  font-weight: 500;
+  transition: text-decoration 0.2s;
+}
+
+.coord-details a:hover {
+  text-decoration: underline;
+}
+
+.golden-divider {
+  height: 2px;
+  background-color: var(--or);
+  margin: 40px 0;
+  opacity: 0.5;
+  border-radius: 2px;
+}
+
+.horaires-box {
+  background-color: var(--gris-clair);
+  padding: 25px;
+  border-radius: 12px;
+  border-left: 4px solid var(--or);
+}
+
+.horaires-box h4 {
+  color: var(--bleu-marine);
+  font-size: 1.1rem;
+  margin-bottom: 15px;
+}
+
+.horaires-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.horaires-list li {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.95rem;
+  color: var(--texte-fonce);
+  font-weight: 500;
+}
+
+/* Colonne Droite - Formulaire */
+.contact-form-col {
+  flex: 1;
+}
+
+.form-card {
+  background-color: var(--blanc);
+  padding: 30px;
+  border-radius: 16px;
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.form-title {
+  color: var(--bleu-marine);
+  font-size: 1.5rem;
+  margin-bottom: 25px;
+  font-weight: 700;
+}
+
+.contact-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.form-row {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.form-group label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--texte-fonce);
+}
+
+.required-star {
+  color: #dc2626;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+  padding: 12px 16px;
+  border: 1.5px solid #E5E7EB;
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 0.95rem;
+  color: var(--texte-fonce);
+  transition: all 0.3s;
+  background-color: #FAFAFA;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: var(--or);
+  background-color: var(--blanc);
+  box-shadow: 0 0 0 4px rgba(201, 149, 42, 0.15);
+}
+
+.form-group textarea {
+  resize: vertical;
+}
+
+.btn-submit {
+  width: 100%;
+  padding: 14px;
+  font-size: 1rem;
+  font-weight: 700;
+  margin-top: 10px;
+}
+
+/* Alerts */
+.alert {
+  padding: 15px;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  margin-bottom: 20px;
+  font-weight: 500;
+  line-height: 1.5;
+}
+
+.alert-success {
+  background-color: #ECFDF5;
+  color: #047857;
+  border: 1px solid #A7F3D0;
+}
+
+.alert-danger {
+  background-color: #FEF2F2;
+  color: #B91C1C;
+  border: 1px solid #FEE2E2;
+}
+
+/* 3. DEMANDE DE FORMATION */
+.formation-subtitle-text {
+  color: var(--texte-moyen);
+  font-size: 1.1rem;
+  line-height: 1.6;
+  margin-bottom: 30px;
+}
+
+.themes-grid-contact {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.theme-badge-btn {
+  background-color: var(--or);
+  color: var(--blanc);
+  border: none;
+  padding: 10px 20px;
+  border-radius: 50px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 4px 6px rgba(201, 149, 42, 0.15);
+  transition: all 0.3s;
+}
+
+.theme-badge-btn:hover {
+  transform: translateY(-2px);
+  background-color: #b08224;
+  box-shadow: 0 6px 12px rgba(201, 149, 42, 0.3);
+}
+
+/* 4. INFORMATIONS LÉGALES */
+.legal-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 30px;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.legal-info-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.legal-info-list li {
+  font-size: 1.05rem;
+  color: rgba(255, 255, 255, 0.85);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.legal-info-list .bullet {
+  font-size: 1rem;
+}
+
+.legal-info-list li strong {
+  color: var(--blanc);
+  font-weight: 600;
+}
+
+/* RESPONSIVE */
+@media (min-width: 768px) {
+  .contact-hero {
+    padding: 140px 0 100px 0;
+  }
+
+  .contact-container {
+    flex-direction: row;
+    gap: 60px;
+    align-items: flex-start;
+  }
+
+  .form-row {
+    flex-direction: row;
+  }
+
+  .form-row .form-group {
+    flex: 1;
+  }
+
+  .legal-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 60px;
+  }
+}
