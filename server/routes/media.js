@@ -52,9 +52,12 @@ router.post('/upload', authMiddleware, upload.single('image'), async (req, res) 
     const publicId = uploadResult.public_id;
     const taille = req.file.size;
 
+    const [maxRes] = await db.query('SELECT COALESCE(MAX(id), 0) + 1 AS nextId FROM medias');
+    const nextId = maxRes[0].nextId;
+
     await db.query(
-      'INSERT INTO medias (nom, chemin, public_id, resource_type, taille) VALUES (?, ?, ?, ?, ?)',
-      [nom, chemin, publicId, resourceType, taille]
+      'INSERT INTO medias (id, nom, chemin, public_id, resource_type, taille) VALUES (?, ?, ?, ?, ?, ?)',
+      [nextId, nom, chemin, publicId, resourceType, taille]
     );
 
     const [newRow] = await db.query('SELECT * FROM medias WHERE public_id = ?', [publicId]);
