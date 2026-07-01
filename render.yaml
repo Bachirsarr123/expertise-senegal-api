@@ -1,0 +1,44 @@
+﻿# render.yaml — Configuration de déploiement Render
+# Placer ce fichier à la racine du dépôt Git
+# Doc : https://render.com/docs/blueprint-spec
+
+services:
+  - type: web
+    name: expertise-senegal-api
+    runtime: node
+    rootDir: server
+    buildCommand: npm install
+    startCommand: node index.js
+    plan: free
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DB_SSL
+        value: "true"
+      # Les variables suivantes sont à renseigner manuellement
+      # dans Render Dashboard > Environment
+      # (ne jamais les mettre en clair dans ce fichier)
+      - key: DB_HOST
+        sync: false
+      - key: DB_PORT
+        sync: false
+      - key: DB_USER
+        sync: false
+      - key: DB_PASSWORD
+        sync: false
+      - key: DB_NAME
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+      - key: FRONTEND_URL
+        sync: false
+      - key: MAIL_HOST
+        sync: false
+      - key: MAIL_PORT
+        sync: false
+      - key: MAIL_USER
+        sync: false
+      - key: MAIL_PASS
+        sync: false
+      - key: MAIL_FROM
+        sync: false

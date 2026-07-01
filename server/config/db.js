@@ -1,4 +1,4 @@
-const mysql = require('mysql2/promise');
+﻿const mysql = require('mysql2/promise');
 const bcrypt = require('bcrypt');
 require('dotenv').config();
 
@@ -6,32 +6,27 @@ let pool;
 
 async function initDB() {
   try {
-    // Connection without database to create it if it doesn't exist
-    const connection = await mysql.createConnection({
-      host: process.env.DB_HOST || 'localhost',
-      user: process.env.DB_USER || 'root',
-      password: process.env.DB_PASSWORD || ''
-    });
-
-    const dbName = process.env.DB_NAME || 'expertise_senegal';
-    await connection.query(`CREATE DATABASE IF NOT EXISTS \`${dbName}\` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci`);
-    await connection.end();
-
-    // Connection pool with database
     pool = mysql.createPool({
       host: process.env.DB_HOST || 'localhost',
+      port: parseInt(process.env.DB_PORT || '3306'),
       user: process.env.DB_USER || 'root',
       password: process.env.DB_PASSWORD || '',
-      database: dbName,
+      database: process.env.DB_NAME || 'expertise_senegal',
+      ssl: process.env.DB_SSL === 'true' ? { rejectUnauthorized: true } : undefined,
       waitForConnections: true,
       connectionLimit: 10,
       queueLimit: 0
     });
 
+    // Verify the connection is reachable before proceeding
+    const conn = await pool.getConnection();
+    conn.release();
+
     console.log('Connected to MySQL Database Pool.');
     await createTables();
   } catch (error) {
     console.error('Error connecting/initializing database:', error.message);
+    process.exit(1);
   }
 }
 
@@ -150,7 +145,7 @@ async function createTables() {
       { cle: 'site_slogan', valeur: 'Cabinet Conseil & Études' },
       { cle: 'maintenance_mode', valeur: 'false' },
       { cle: 'contact_address', valeur: '75 C Cité Keur Gorgui, Dakar, Sénégal' },
-      { cle: 'contact_phone', valeur: '33 823 54 52 — 77 643 41 60' },
+      { cle: 'contact_phone', valeur: '33 823 54 52 – 77 643 41 60' },
       { cle: 'contact_email', valeur: 'contact@expertisesenegal.com' },
       { cle: 'legal_rc', valeur: 'SN.DKR.2016.B.26579' },
       { cle: 'legal_ninea', valeur: '006146642 2V2' },
