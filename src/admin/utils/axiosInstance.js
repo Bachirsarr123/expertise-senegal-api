@@ -1,7 +1,7 @@
-import axios from 'axios';
+﻿import axios from 'axios';
 
 const axiosInstance = axios.create({
-  baseURL: 'https://expertise-senegal-api.onrender.com'
+  baseURL: 'https://expertise-senegal-api-olf5.onrender.com'
 });
 
 // Request interceptor to add JWT token
@@ -32,3 +32,4 @@ axiosInstance.interceptors.response.use(
 );
 
 export default axiosInstance;
+
