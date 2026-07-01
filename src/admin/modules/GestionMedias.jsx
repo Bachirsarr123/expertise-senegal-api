@@ -5,166 +5,227 @@ const GestionMedias = ({ triggerToast, triggerConfirm, onMediaAction }) => {
   const [medias, setMedias] = useState([]);
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
+  const [replacingId, setReplacingId] = useState(null);
   const fileInputRef = useRef(null);
+  const replaceInputRef = useRef(null);
 
-  useEffect(() => {
-    fetchMedias();
-  }, []);
+  useEffect(() => { fetchMedias(); }, []);
 
   const fetchMedias = async () => {
     try {
-      const response = await axiosInstance.get('/api/media');
-      setMedias(response.data);
+      const { data } = await axiosInstance.get('/api/media');
+      setMedias(data);
+    } catch {
+      triggerToast('Impossible de charger la bibliotheque de medias.', 'error');
+    } finally {
       setLoading(false);
-    } catch (error) {
-      console.error('Error fetching media:', error);
-      triggerToast('Impossible de charger la bibliothèque de médias.', 'error');
     }
   };
 
-  const handleFileUploadSubmit = async (e) => {
-    e.preventDefault();
-    const files = fileInputRef.current.files;
-    
-    if (files.length === 0) {
-      triggerToast('Veuillez sélectionner un fichier à uploader.', 'error');
-      return;
-    }
+  const isVideo = (media) =>
+    media.resource_type === 'video' || /\.(mp4|webm|mov|avi)$/i.test(media.nom);
 
-    const file = files[0];
-    
-    // Max 5MB check in frontend
-    if (file.size > 5 * 1024 * 1024) {
-      triggerToast('Le fichier est trop volumineux (max 5Mo).', 'error');
-      return;
-    }
-
+  const uploadFile = async (file, replaceId) => {
     const formData = new FormData();
     formData.append('image', file);
-
     setUploading(true);
-    triggerToast('Upload en cours...');
-
     try {
-      const response = await axiosInstance.post('/api/media/upload', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data'
-        }
+      const { data } = await axiosInstance.post('/api/media/upload', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
       });
-
-      // Insert new media in local state
-      setMedias([response.data.media, ...medias]);
-      
-      // Reset input
-      if (fileInputRef.current) {
-        fileInputRef.current.value = '';
-      }
-
-      triggerToast('Photo uploadée avec succès !');
-      onMediaAction(); // Refresh stats count
-    } catch (err) {
-      console.error('Error uploading media:', err);
-      if (err.response && err.response.data && err.response.data.message) {
-        triggerToast(err.response.data.message, 'error');
+      if (replaceId) {
+        await axiosInstance.delete(`/api/media/${replaceId}`);
+        setMedias(prev => [data.media, ...prev.filter(m => m.id !== replaceId)]);
+        triggerToast('Media remplace avec succes !');
       } else {
-        triggerToast("Erreur lors de l'upload.", 'error');
+        setMedias(prev => [data.media, ...prev]);
+        triggerToast('Fichier uploade avec succes !');
       }
+      onMediaAction();
+    } catch (err) {
+      triggerToast(err.response?.data?.message || "Erreur lors de l'upload.", 'error');
     } finally {
       setUploading(false);
+      setReplacingId(null);
     }
   };
 
-  const handleDeleteMedia = (id) => {
-    triggerConfirm('Êtes-vous sûr de vouloir supprimer cette image ? Elle sera supprimée définitivement du serveur.', async () => {
+  const handleUpload = async (e) => {
+    e.preventDefault();
+    const file = fileInputRef.current.files[0];
+    if (!file) { triggerToast('Selectionnez un fichier.', 'error'); return; }
+    await uploadFile(file, null);
+    if (fileInputRef.current) fileInputRef.current.value = '';
+  };
+
+  const handleReplace = (mediaId) => {
+    setReplacingId(mediaId);
+    replaceInputRef.current.click();
+  };
+
+  const handleReplaceFileSelected = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    await uploadFile(file, replacingId);
+    e.target.value = '';
+  };
+
+  const handleDelete = (id) => {
+    triggerConfirm('Supprimer ce media definitivement de Cloudinary ?', async () => {
       try {
         await axiosInstance.delete(`/api/media/${id}`);
-        setMedias(medias.filter(m => m.id !== id));
-        triggerToast('Image supprimée avec succès.');
-        onMediaAction(); // Refresh stats count
-      } catch (err) {
-        console.error('Error deleting media:', err);
+        setMedias(prev => prev.filter(m => m.id !== id));
+        triggerToast('Media supprime.');
+        onMediaAction();
+      } catch {
         triggerToast('Erreur lors de la suppression.', 'error');
       }
     });
   };
 
-  const handleCopyLink = (chemin) => {
-    const fullLink = `https://expertise-senegal-api-olf5.onrender.com${chemin}`;
-    navigator.clipboard.writeText(fullLink);
-    triggerToast('Lien de la photo copié dans le presse-papiers !');
+  const handleCopyUrl = (url) => {
+    navigator.clipboard.writeText(url);
+    triggerToast('URL Cloudinary copiee dans le presse-papiers !');
   };
 
   const formatSize = (bytes) => {
-    if (bytes === 0) return '0 B';
+    if (!bytes || bytes === 0) return '-';
     const k = 1024;
-    const sizes = ['B', 'KB', 'MB'];
+    const sizes = ['B', 'KB', 'MB', 'GB'];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
   };
 
-  if (loading) return <div className="loading-spinner">Chargement de la bibliothèque de médias...</div>;
+  if (loading) return <div className="loading-spinner">Chargement de la bibliotheque...</div>;
 
   return (
     <div className="gestion-medias-module">
-      {/* Upload Box */}
+
+      {/* Input cache pour remplacer */}
+      <input
+        type="file"
+        ref={replaceInputRef}
+        accept=".jpg,.jpeg,.png,.webp,.gif,.mp4,.webm,.mov"
+        style={{ display: 'none' }}
+        onChange={handleReplaceFileSelected}
+      />
+
+      {/* Upload */}
       <div className="admin-card">
-        <h2 className="admin-card-title">Uploader une nouvelle photo</h2>
-        <form onSubmit={handleFileUploadSubmit} className="admin-form">
-          <p className="mb-3">Formats autorisés : **JPG, PNG, WebP** — Taille max : **5 Mo**</p>
-          
-          <div className="form-group mb-4" style={{ backgroundColor: 'var(--gris-clair)', padding: '30px', border: '2px dashed #D1D5DB', borderRadius: '10px', textAlign: 'center' }}>
-            <span style={{ fontSize: '3rem', display: 'block', marginBottom: '10px' }}>📤</span>
-            <input 
-              type="file" 
-              ref={fileInputRef} 
-              accept=".jpg,.jpeg,.png,.webp"
-              required 
-              style={{ margin: '0 auto', display: 'block', maxWidth: '300px' }}
+        <h2 className="admin-card-title">Ajouter un media</h2>
+        <div style={{ marginBottom: '12px', padding: '10px 14px', background: '#f0fdf4', border: '1px solid #86efac', borderRadius: '8px', fontSize: '0.85rem', color: '#166534' }}>
+          &#9989; Stockage Cloudinary actif - vos fichiers sont permanents et ne seront jamais perdus.
+        </div>
+        <form onSubmit={handleUpload} className="admin-form">
+          <p className="mb-3" style={{ color: '#6b7280', fontSize: '0.88rem' }}>
+            Images : JPG, PNG, WebP, GIF (max 10 Mo) &bull; Videos : MP4, WebM, MOV (max 50 Mo)
+          </p>
+          <div
+            className="form-group mb-4"
+            style={{ background: '#f9fafb', padding: '30px', border: '2px dashed #D1D5DB', borderRadius: '10px', textAlign: 'center' }}
+          >
+            <span style={{ fontSize: '2.5rem', display: 'block', marginBottom: '10px' }}>&#128228;</span>
+            <input
+              type="file"
+              ref={fileInputRef}
+              accept=".jpg,.jpeg,.png,.webp,.gif,.mp4,.webm,.mov"
+              required
+              style={{ margin: '0 auto', display: 'block', maxWidth: '340px' }}
             />
           </div>
-
           <button type="submit" className="admin-btn admin-btn-primary" disabled={uploading}>
-            {uploading ? 'Upload en cours...' : 'Téléverser sur le serveur'}
+            {uploading ? 'Upload en cours...' : 'Envoyer sur Cloudinary'}
           </button>
         </form>
       </div>
 
-      {/* Medias Grid */}
+      {/* Bibliotheque */}
       <div className="admin-card">
-        <h2 className="admin-card-title">Bibliothèque de photos ({medias.length})</h2>
+        <h2 className="admin-card-title">Bibliotheque de medias ({medias.length})</h2>
         {medias.length === 0 ? (
-          <p className="text-center py-4">Aucune photo dans la bibliothèque. Téléversez-en une ci-dessus.</p>
+          <p className="text-center py-4" style={{ color: '#6b7280' }}>
+            Aucun media. Uploadez-en un ci-dessus.
+          </p>
         ) : (
           <div className="medias-grid">
             {medias.map(media => {
-              const fullUrl = `https://expertise-senegal-api-olf5.onrender.com${media.chemin}`;
-
+              const video = isVideo(media);
               return (
                 <div key={media.id} className="media-item-card">
-                  <div className="media-img-wrapper">
-                    <img src={fullUrl} alt={media.nom} />
+                  <div className="media-img-wrapper" style={{ position: 'relative', background: '#111' }}>
+                    {video ? (
+                      <video
+                        src={media.chemin}
+                        controls
+                        style={{ width: '100%', height: '150px', objectFit: 'cover' }}
+                      />
+                    ) : (
+                      <img
+                        src={media.chemin}
+                        alt={media.nom}
+                        style={{ width: '100%', height: '150px', objectFit: 'cover' }}
+                      />
+                    )}
+                    <span style={{
+                      position: 'absolute', top: '6px', left: '6px',
+                      background: video ? '#7c3aed' : '#0369a1',
+                      color: '#fff', fontSize: '0.65rem', fontWeight: 700,
+                      padding: '2px 7px', borderRadius: '4px', textTransform: 'uppercase',
+                      letterSpacing: '0.5px'
+                    }}>
+                      {video ? 'VIDEO' : 'IMAGE'}
+                    </span>
                   </div>
+
                   <div className="media-card-details">
                     <div>
-                      <h4 title={media.nom}>{media.nom}</h4>
-                      <div className="media-card-size mt-1">{formatSize(media.taille)}</div>
+                      <h4
+                        title={media.nom}
+                        style={{ fontSize: '0.8rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '180px', margin: 0 }}
+                      >
+                        {media.nom}
+                      </h4>
+                      <div style={{ fontSize: '0.72rem', color: '#9ca3af', marginTop: '3px' }}>
+                        {formatSize(media.taille)}
+                      </div>
                     </div>
-                    <div className="media-card-actions">
-                      <button 
-                        className="admin-btn admin-btn-outline" 
-                        style={{ padding: '6px', flex: 1, fontSize: '0.8rem', justifyContent: 'center' }} 
-                        onClick={() => handleCopyLink(media.chemin)}
-                        title="Copier le lien"
+
+                    <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap', marginTop: '10px' }}>
+                      <button
+                        className="admin-btn admin-btn-outline"
+                        style={{ padding: '4px 8px', fontSize: '0.72rem' }}
+                        onClick={() => handleCopyUrl(media.chemin)}
+                        title="Copier l'URL"
                       >
-                        🔗 Copier
+                        &#128279; URL
                       </button>
-                      <button 
-                        className="admin-btn admin-btn-danger" 
-                        style={{ padding: '6px', fontSize: '0.8rem' }} 
-                        onClick={() => handleDeleteMedia(media.id)}
-                        title="Supprimer"
+                      <a
+                        href={media.chemin}
+                        download={media.nom}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="admin-btn admin-btn-outline"
+                        style={{ padding: '4px 8px', fontSize: '0.72rem', textDecoration: 'none', display: 'inline-flex', alignItems: 'center' }}
+                        title="Telecharger"
                       >
-                        🗑️
+                        &#11123; Telecharger
+                      </a>
+                      <button
+                        className="admin-btn admin-btn-outline"
+                        style={{ padding: '4px 8px', fontSize: '0.72rem', color: '#d97706', borderColor: '#d97706' }}
+                        onClick={() => handleReplace(media.id)}
+                        title="Remplacer par un autre fichier"
+                        disabled={uploading}
+                      >
+                        &#8635; Remplacer
+                      </button>
+                      <button
+                        className="admin-btn admin-btn-danger"
+                        style={{ padding: '4px 8px', fontSize: '0.72rem' }}
+                        onClick={() => handleDelete(media.id)}
+                        title="Supprimer definitivement"
+                      >
+                        &#128465; Supprimer
                       </button>
                     </div>
                   </div>

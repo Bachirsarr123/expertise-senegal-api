@@ -84,7 +84,9 @@ async function createTables() {
       CREATE TABLE IF NOT EXISTS medias (
         id INT PRIMARY KEY AUTO_INCREMENT,
         nom VARCHAR(255),
-        chemin VARCHAR(255),
+        chemin VARCHAR(500),
+        public_id VARCHAR(255),
+        resource_type VARCHAR(20) DEFAULT 'image',
         taille INT,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       )

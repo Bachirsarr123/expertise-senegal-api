@@ -2,47 +2,26 @@ const express = require('express');
 const router = express.Router();
 const multer = require('multer');
 const path = require('path');
-const fs = require('fs');
 const db = require('../config/db');
 const authMiddleware = require('../middleware/auth');
+const cloudinary = require('../config/cloudinary');
 
-// Make sure uploads directory exists
-const uploadsDir = path.join(__dirname, '../uploads');
-if (!fs.existsSync(uploadsDir)) {
-  fs.mkdirSync(uploadsDir, { recursive: true });
-}
-
-// Multer Config
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, uploadsDir);
-  },
-  filename: (req, file, cb) => {
-    // timestamp_filename.ext
-    const uniqueSuffix = Date.now() + '_' + file.originalname.replace(/\s+/g, '_');
-    cb(null, uniqueSuffix);
-  }
-});
-
-// File filter (JPG, PNG, WebP, max 5MB)
-const fileFilter = (req, file, cb) => {
-  const allowedExtensions = ['.jpg', '.jpeg', '.png', '.webp'];
-  const ext = path.extname(file.originalname).toLowerCase();
-  
-  if (allowedExtensions.includes(ext)) {
-    cb(null, true);
-  } else {
-    cb(new Error('Format d\'image non supporté (uniquement JPG, PNG, WebP)'));
-  }
-};
+const ALLOWED_EXTENSIONS = ['.jpg', '.jpeg', '.png', '.webp', '.gif', '.mp4', '.webm', '.mov', '.avi'];
 
 const upload = multer({
-  storage: storage,
-  fileFilter: fileFilter,
-  limits: { fileSize: 5 * 1024 * 1024 } // 5MB limit
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 50 * 1024 * 1024 },
+  fileFilter: (req, file, cb) => {
+    const ext = path.extname(file.originalname).toLowerCase();
+    if (ALLOWED_EXTENSIONS.includes(ext)) {
+      cb(null, true);
+    } else {
+      cb(new Error('Format non supporte. Utilise JPG, PNG, WebP, GIF, MP4, WebM ou MOV.'));
+    }
+  }
 });
 
-// Protected: Get all uploaded medias
+// GET all medias
 router.get('/', authMiddleware, async (req, res) => {
   try {
     const [rows] = await db.query('SELECT * FROM medias ORDER BY created_at DESC');
@@ -53,71 +32,61 @@ router.get('/', authMiddleware, async (req, res) => {
   }
 });
 
-// Protected: Upload new media
-router.post('/upload', authMiddleware, (req, res) => {
-  upload.single('image')(req, res, async (err) => {
-    if (err instanceof multer.MulterError) {
-      if (err.code === 'LIMIT_FILE_SIZE') {
-        return res.status(400).json({ message: 'La taille du fichier dépasse la limite de 5Mo.' });
-      }
-      return res.status(400).json({ message: err.message });
-    } else if (err) {
-      return res.status(400).json({ message: err.message });
-    }
+// POST upload to Cloudinary
+router.post('/upload', authMiddleware, upload.single('image'), async (req, res) => {
+  if (!req.file) return res.status(400).json({ message: 'Aucun fichier recu.' });
 
-    if (!req.file) {
-      return res.status(400).json({ message: 'Veuillez sélectionner un fichier.' });
-    }
+  try {
+    const isVideo = req.file.mimetype.startsWith('video/');
+    const resourceType = isVideo ? 'video' : 'image';
 
-    try {
-      const nom = req.file.originalname;
-      // The public path under /uploads/...
-      const chemin = `/uploads/${req.file.filename}`;
-      const taille = req.file.size;
+    const uploadResult = await new Promise((resolve, reject) => {
+      cloudinary.uploader.upload_stream(
+        { folder: 'expertise-senegal', resource_type: resourceType },
+        (error, result) => { if (error) reject(error); else resolve(result); }
+      ).end(req.file.buffer);
+    });
 
-      const [result] = await db.query(
-        'INSERT INTO medias (nom, chemin, taille) VALUES (?, ?, ?)',
-        [nom, chemin, taille]
-      );
+    const nom = req.file.originalname;
+    const chemin = uploadResult.secure_url;
+    const publicId = uploadResult.public_id;
+    const taille = req.file.size;
 
-      res.status(201).json({
-        message: 'Fichier uploadé avec succès.',
-        media: {
-          id: result.insertId,
-          nom,
-          chemin,
-          taille
-        }
-      });
-    } catch (error) {
-      console.error('Error saving media path:', error);
-      res.status(500).json({ message: 'Erreur serveur.' });
-    }
-  });
+    await db.query(
+      'INSERT INTO medias (nom, chemin, public_id, resource_type, taille) VALUES (?, ?, ?, ?, ?)',
+      [nom, chemin, publicId, resourceType, taille]
+    );
+
+    const [newRow] = await db.query('SELECT * FROM medias WHERE public_id = ?', [publicId]);
+    const media = newRow[0] || { nom, chemin, public_id: publicId, resource_type: resourceType, taille };
+
+    res.status(201).json({ message: 'Fichier uploade avec succes.', media });
+  } catch (error) {
+    console.error('Error uploading to Cloudinary:', error);
+    res.status(500).json({ message: 'Erreur upload Cloudinary: ' + error.message });
+  }
 });
 
-// Protected: Delete media
+// DELETE media (from Cloudinary + DB)
 router.delete('/:id', authMiddleware, async (req, res) => {
   const { id } = req.params;
 
   try {
     const [rows] = await db.query('SELECT * FROM medias WHERE id = ?', [id]);
-    if (rows.length === 0) {
-      return res.status(404).json({ message: 'Média introuvable.' });
-    }
+    if (rows.length === 0) return res.status(404).json({ message: 'Media introuvable.' });
 
     const media = rows[0];
-    const filePath = path.join(__dirname, '..', media.chemin);
 
-    // Delete file from disk
-    if (fs.existsSync(filePath)) {
-      fs.unlinkSync(filePath);
+    if (media.public_id) {
+      try {
+        await cloudinary.uploader.destroy(media.public_id, { resource_type: media.resource_type || 'image' });
+      } catch (cldErr) {
+        console.warn('Cloudinary delete warning:', cldErr.message);
+      }
     }
 
-    // Delete record from DB
     await db.query('DELETE FROM medias WHERE id = ?', [id]);
-
-    res.json({ message: 'Média supprimé avec succès.' });
+    res.json({ message: 'Media supprime avec succes.' });
   } catch (error) {
     console.error('Error deleting media:', error);
     res.status(500).json({ message: 'Erreur serveur.' });
