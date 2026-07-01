@@ -1,137 +1,127 @@
-import { useState, useEffect } from 'react';
+﻿import { useState, useEffect } from 'react';
 import axiosInstance from '../utils/axiosInstance';
 
 const Parametres = ({ triggerToast, triggerConfirm }) => {
   const [loading, setLoading] = useState(true);
 
-  // Site Settings
-  const [siteName, setSiteName] = useState('');
-  const [siteSlogan, setSiteSlogan] = useState('');
+  // Site
+  const [siteName, setSiteName]         = useState('');
+  const [siteSlogan, setSiteSlogan]     = useState('');
   const [maintenanceMode, setMaintenanceMode] = useState(false);
 
-  // Contact details
-  const [contactPhone, setContactPhone] = useState('');
-  const [contactEmail, setContactEmail] = useState('');
+  // Contact
+  const [contactPhone, setContactPhone]   = useState('');
+  const [contactEmail, setContactEmail]   = useState('');
   const [contactAddress, setContactAddress] = useState('');
 
-  // Legal details
-  const [legalRC, setLegalRC] = useState('');
-  const [legalNinea, setLegalNinea] = useState('');
-  const [legalCapital, setLegalCapital] = useState('');
-  const [legalFiscalCentre, setLegalFiscalCentre] = useState('');
-  const [legalActivity, setLegalActivity] = useState('');
+  // WhatsApp & Horaires
+  const [whatsappNumber, setWhatsappNumber] = useState('');
+  const [hoursMonFri, setHoursMonFri]       = useState('');
+  const [hoursSat, setHoursSat]             = useState('');
+  const [hoursSun, setHoursSun]             = useState('');
 
-  // Change Password
+  // Legal
+  const [legalRC, setLegalRC]                   = useState('');
+  const [legalNinea, setLegalNinea]             = useState('');
+  const [legalCapital, setLegalCapital]         = useState('');
+  const [legalFiscalCentre, setLegalFiscalCentre] = useState('');
+  const [legalActivity, setLegalActivity]       = useState('');
+
+  // Password
   const [currentPassword, setCurrentPassword] = useState('');
-  const [newPassword, setNewPassword] = useState('');
+  const [newPassword, setNewPassword]         = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
 
-  useEffect(() => {
-    fetchSettings();
-  }, []);
+  useEffect(() => { fetchSettings(); }, []);
 
   const fetchSettings = async () => {
     try {
-      const response = await axiosInstance.get('/api/content/parametres');
-      const params = response.data;
-
-      setSiteName(params.site_name || 'Expertise Sénégal');
-      setSiteSlogan(params.site_slogan || 'Cabinet Conseil & Études');
-      setMaintenanceMode(params.maintenance_mode === 'true');
-
-      setContactPhone(params.contact_phone || '');
-      setContactEmail(params.contact_email || '');
-      setContactAddress(params.contact_address || '');
-
-      setLegalRC(params.legal_rc || '');
-      setLegalNinea(params.legal_ninea || '');
-      setLegalCapital(params.legal_capital || '');
-      setLegalFiscalCentre(params.legal_fiscal_centre || '');
-      setLegalActivity(params.legal_activity || '');
-
+      const { data } = await axiosInstance.get('/api/content/parametres');
+      setSiteName(data.site_name || 'Expertise Senegal');
+      setSiteSlogan(data.site_slogan || 'Cabinet Conseil & Etudes');
+      setMaintenanceMode(data.maintenance_mode === 'true');
+      setContactPhone(data.contact_phone || '');
+      setContactEmail(data.contact_email || '');
+      setContactAddress(data.contact_address || '');
+      setWhatsappNumber(data.whatsapp_number || '221776434160');
+      setHoursMonFri(data.hours_mon_fri || '08h00 - 18h00');
+      setHoursSat(data.hours_sat || '09h00 - 13h00');
+      setHoursSun(data.hours_sun || 'Ferme');
+      setLegalRC(data.legal_rc || '');
+      setLegalNinea(data.legal_ninea || '');
+      setLegalCapital(data.legal_capital || '');
+      setLegalFiscalCentre(data.legal_fiscal_centre || '');
+      setLegalActivity(data.legal_activity || '');
+    } catch {
+      triggerToast('Erreur chargement des parametres.', 'error');
+    } finally {
       setLoading(false);
-    } catch (error) {
-      console.error('Error fetching settings:', error);
-      triggerToast('Erreur lors du chargement des paramètres.', 'error');
     }
   };
 
-  const handleSaveGeneralSettings = () => {
-    triggerConfirm('Enregistrer les modifications des paramètres généraux ?', async () => {
+  const handleSave = () => {
+    triggerConfirm('Enregistrer les modifications ?', async () => {
       try {
-        const settings = {
+        await axiosInstance.put('/api/content/parametres', {
           site_name: siteName,
           site_slogan: siteSlogan,
           maintenance_mode: String(maintenanceMode),
           contact_phone: contactPhone,
           contact_email: contactEmail,
           contact_address: contactAddress,
+          whatsapp_number: whatsappNumber,
+          hours_mon_fri: hoursMonFri,
+          hours_sat: hoursSat,
+          hours_sun: hoursSun,
           legal_rc: legalRC,
           legal_ninea: legalNinea,
           legal_capital: legalCapital,
           legal_fiscal_centre: legalFiscalCentre,
-          legal_activity: legalActivity
-        };
-
-        await axiosInstance.put('/api/content/parametres', settings);
-        triggerToast('Paramètres généraux mis à jour.');
-      } catch (err) {
-        console.error('Error saving settings:', err);
+          legal_activity: legalActivity,
+        });
+        triggerToast('Parametres mis a jour avec succes.');
+      } catch {
         triggerToast('Erreur lors de la sauvegarde.', 'error');
       }
     });
   };
 
-  const handleChangePasswordSubmit = (e) => {
+  const handleChangePassword = (e) => {
     e.preventDefault();
-
     if (!currentPassword || !newPassword || !confirmPassword) {
-      triggerToast('Veuillez remplir tous les champs du mot de passe.', 'error');
-      return;
+      triggerToast('Veuillez remplir tous les champs.', 'error'); return;
     }
-
     if (newPassword !== confirmPassword) {
-      triggerToast('Les nouveaux mots de passe ne correspondent pas.', 'error');
-      return;
+      triggerToast('Les nouveaux mots de passe ne correspondent pas.', 'error'); return;
     }
-
-    triggerConfirm('Confirmer le changement de mot de passe administrateur ?', async () => {
+    triggerConfirm('Confirmer le changement de mot de passe ?', async () => {
       try {
-        await axiosInstance.post('/api/auth/change-password', {
-          currentPassword,
-          newPassword
-        });
-
-        setCurrentPassword('');
-        setNewPassword('');
-        setConfirmPassword('');
-        triggerToast('Votre mot de passe a été modifié avec succès.');
+        await axiosInstance.post('/api/auth/change-password', { currentPassword, newPassword });
+        setCurrentPassword(''); setNewPassword(''); setConfirmPassword('');
+        triggerToast('Mot de passe modifie avec succes.');
       } catch (err) {
-        console.error('Error changing password:', err);
-        if (err.response && err.response.data && err.response.data.message) {
-          triggerToast(err.response.data.message, 'error');
-        } else {
-          triggerToast('Erreur lors de la modification du mot de passe.', 'error');
-        }
+        triggerToast(err.response?.data?.message || 'Erreur changement mot de passe.', 'error');
       }
     });
   };
 
-  if (loading) return <div className="loading-spinner">Chargement des paramètres généraux...</div>;
+  if (loading) return <div className="loading-spinner">Chargement des parametres...</div>;
 
   return (
     <div className="gestion-parametres-module">
-      {/* General Settings */}
+
+      {/* GENERAL */}
       <div className="admin-card">
-        <h2 className="admin-card-title">Paramètres généraux du site</h2>
+        <h2 className="admin-card-title">Parametres generaux du site</h2>
         <div className="admin-form">
+
           <div className="admin-input-grid mb-4">
             <div className="form-group">
               <label>Nom du site</label>
               <input type="text" value={siteName} onChange={e => setSiteName(e.target.value)} />
             </div>
             <div className="form-group">
-              <label>Slogan de l'entreprise</label>
+              <label>Slogan</label>
               <input type="text" value={siteSlogan} onChange={e => setSiteSlogan(e.target.value)} />
             </div>
           </div>
@@ -144,7 +134,7 @@ const Parametres = ({ triggerToast, triggerConfirm }) => {
                   <div className="toggle-switch-handle"></div>
                 </div>
                 <span className="toggle-switch-label" style={{ color: maintenanceMode ? '#EF4444' : '#10B981', fontWeight: 'bold' }}>
-                  {maintenanceMode ? 'ACTIF (Site inaccessible au public)' : 'INACTIF (Site public en ligne)'}
+                  {maintenanceMode ? 'ACTIF (site inaccessible)' : 'INACTIF (site en ligne)'}
                 </span>
               </div>
             </div>
@@ -152,10 +142,11 @@ const Parametres = ({ triggerToast, triggerConfirm }) => {
 
           <div className="golden-divider" style={{ margin: '30px 0' }}></div>
 
-          <h3>Coordonnées de l'entreprise</h3>
+          {/* COORDONNEES */}
+          <h3>Coordonnees de l'entreprise</h3>
           <div className="admin-input-grid mb-4">
             <div className="form-group">
-              <label>Téléphone de contact</label>
+              <label>Telephone de contact</label>
               <input type="text" value={contactPhone} onChange={e => setContactPhone(e.target.value)} />
             </div>
             <div className="form-group">
@@ -170,14 +161,48 @@ const Parametres = ({ triggerToast, triggerConfirm }) => {
 
           <div className="golden-divider" style={{ margin: '30px 0' }}></div>
 
-          <h3>Informations Administratives &amp; Légales</h3>
+          {/* WHATSAPP & HORAIRES */}
+          <h3>WhatsApp & Horaires d'ouverture</h3>
+          <div className="form-group mb-4">
+            <label>Numero WhatsApp <span style={{ fontSize: '0.78rem', color: '#6b7280', fontWeight: 400 }}>(chiffres uniquement, ex: 221776434160)</span></label>
+            <input
+              type="text"
+              value={whatsappNumber}
+              onChange={e => setWhatsappNumber(e.target.value.replace(/\D/g, ''))}
+              placeholder="221776434160"
+            />
+            {whatsappNumber && (
+              <p style={{ marginTop: '6px', fontSize: '0.78rem', color: '#6b7280' }}>
+                Lien genere : wa.me/{whatsappNumber}
+              </p>
+            )}
+          </div>
           <div className="admin-input-grid mb-4">
             <div className="form-group">
-              <label>N° Registre du Commerce (RC)</label>
+              <label>Lundi - Vendredi</label>
+              <input type="text" value={hoursMonFri} onChange={e => setHoursMonFri(e.target.value)} placeholder="08h00 - 18h00" />
+            </div>
+            <div className="form-group">
+              <label>Samedi</label>
+              <input type="text" value={hoursSat} onChange={e => setHoursSat(e.target.value)} placeholder="09h00 - 13h00" />
+            </div>
+          </div>
+          <div className="form-group mb-4">
+            <label>Dimanche</label>
+            <input type="text" value={hoursSun} onChange={e => setHoursSun(e.target.value)} placeholder="Ferme" style={{ maxWidth: '280px' }} />
+          </div>
+
+          <div className="golden-divider" style={{ margin: '30px 0' }}></div>
+
+          {/* LEGAL */}
+          <h3>Informations Administratives & Legales</h3>
+          <div className="admin-input-grid mb-4">
+            <div className="form-group">
+              <label>N Registre du Commerce (RC)</label>
               <input type="text" value={legalRC} onChange={e => setLegalRC(e.target.value)} />
             </div>
             <div className="form-group">
-              <label>N° NINEA</label>
+              <label>N NINEA</label>
               <input type="text" value={legalNinea} onChange={e => setLegalNinea(e.target.value)} />
             </div>
           </div>
@@ -192,59 +217,40 @@ const Parametres = ({ triggerToast, triggerConfirm }) => {
             </div>
           </div>
           <div className="form-group mb-4">
-            <label>Activité déclarée</label>
+            <label>Activite declaree</label>
             <input type="text" value={legalActivity} onChange={e => setLegalActivity(e.target.value)} />
           </div>
 
-          <button className="admin-btn admin-btn-secondary" onClick={handleSaveGeneralSettings}>
-            💾 Enregistrer Paramètres
+          <button className="admin-btn admin-btn-secondary" onClick={handleSave}>
+            Enregistrer les parametres
           </button>
         </div>
       </div>
 
-      {/* Change Password */}
+      {/* PASSWORD */}
       <div className="admin-card">
-        <h2 className="admin-card-title">Sécurité - Modifier le mot de passe administrateur</h2>
-        <form onSubmit={handleChangePasswordSubmit} className="admin-form">
+        <h2 className="admin-card-title">Securite - Modifier le mot de passe</h2>
+        <form onSubmit={handleChangePassword} className="admin-form">
           <div className="form-group mb-3">
             <label>Mot de passe actuel</label>
-            <input 
-              type="password" 
-              value={currentPassword} 
-              onChange={e => setCurrentPassword(e.target.value)} 
-              placeholder="••••••••"
-              required 
-            />
+            <input type="password" value={currentPassword} onChange={e => setCurrentPassword(e.target.value)} required />
           </div>
-
           <div className="admin-input-grid mb-4">
             <div className="form-group">
               <label>Nouveau mot de passe</label>
-              <input 
-                type="password" 
-                value={newPassword} 
-                onChange={e => setNewPassword(e.target.value)} 
-                placeholder="••••••••"
-                required 
-              />
+              <input type="password" value={newPassword} onChange={e => setNewPassword(e.target.value)} required />
             </div>
             <div className="form-group">
               <label>Confirmer le nouveau mot de passe</label>
-              <input 
-                type="password" 
-                value={confirmPassword} 
-                onChange={e => setConfirmPassword(e.target.value)} 
-                placeholder="••••••••"
-                required 
-              />
+              <input type="password" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} required />
             </div>
           </div>
-
           <button type="submit" className="admin-btn admin-btn-danger">
-            🔑 Mettre à jour le mot de passe
+            Mettre a jour le mot de passe
           </button>
         </form>
       </div>
+
     </div>
   );
 };

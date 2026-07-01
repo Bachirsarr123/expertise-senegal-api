@@ -1,34 +1,36 @@
-import { useState, useEffect } from 'react';
+﻿import { useState, useEffect } from 'react';
+import axios from 'axios';
 import './WhatsAppButton.css';
 
 const WhatsAppButton = () => {
   const [isVisible, setIsVisible] = useState(false);
+  const [phone, setPhone] = useState('221776434160');
 
   useEffect(() => {
-    // Check if device is mobile
-    const isMobile = window.innerWidth <= 768;
+    axios.get('https://expertise-senegal-api-olf5.onrender.com/api/content/parametres')
+      .then(res => { if (res.data.whatsapp_number) setPhone(res.data.whatsapp_number); })
+      .catch(() => {});
 
+    const isMobile = window.innerWidth <= 768;
     if (isMobile) {
       setIsVisible(true);
     } else {
-      // Delay visibility on desktop by 3 seconds
-      const timer = setTimeout(() => {
-        setIsVisible(true);
-      }, 3000);
-
+      const timer = setTimeout(() => setIsVisible(true), 3000);
       return () => clearTimeout(timer);
     }
   }, []);
 
   if (!isVisible) return null;
 
+  const message = encodeURIComponent("Bonjour Expertise Senegal, je souhaite obtenir un devis pour vos services.");
+
   return (
     <div className="whatsapp-btn-container">
       <span className="whatsapp-tooltip">Discutons sur WhatsApp</span>
-      <a 
-        href="https://wa.me/221776434160?text=Bonjour%20Expertise%20S%C3%A9n%C3%A9gal%2C%20je%20souhaite%20obtenir%20un%20devis%20pour%20vos%20services." 
-        target="_blank" 
-        rel="noopener noreferrer" 
+      <a
+        href={`https://wa.me/${phone}?text=${message}`}
+        target="_blank"
+        rel="noopener noreferrer"
         className="whatsapp-btn"
         aria-label="Discuter sur WhatsApp"
       >

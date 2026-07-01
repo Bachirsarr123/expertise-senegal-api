@@ -151,7 +151,11 @@ async function createTables() {
       { cle: 'legal_ninea', valeur: '006146642 2V2' },
       { cle: 'legal_capital', valeur: '100 000 F CFA' },
       { cle: 'legal_fiscal_centre', valeur: 'Dakar-Liberté' },
-      { cle: 'legal_activity', valeur: 'Conseil, Études et Formation' }
+      { cle: 'legal_activity', valeur: 'Conseil, Études et Formation' },
+      { cle: 'whatsapp_number', valeur: '221776434160' },
+      { cle: 'hours_mon_fri', valeur: '08h00 - 18h00' },
+      { cle: 'hours_sat', valeur: '09h00 - 13h00' },
+      { cle: 'hours_sun', valeur: 'Ferme' }
     ];
 
     for (const setting of defaultSettings) {
