@@ -160,7 +160,9 @@ async function createTables() {
       { cle: 'hours_sun', valeur: 'Ferme' },
       { cle: 'director_name', valeur: 'Boussirou DIALLO' },
       { cle: 'legal_form', valeur: 'SARL' },
-      { cle: 'founding_date', valeur: '22/11/2016' }
+      { cle: 'founding_date', valeur: '22/11/2016' },
+      { cle: 'footer_description', valeur: 'Cabinet pluridisciplinaire de conseil, de formation et d etudes au service du developpement socio-economique en Afrique de l Ouest depuis 2016.' },
+      { cle: 'footer_copyright', valeur: '2025 Expertise Senegal - Etudes · Conseil · Formation' }
     ];
 
     for (const setting of defaultSettings) {

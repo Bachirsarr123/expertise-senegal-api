@@ -26,6 +26,9 @@ const Parametres = ({ triggerToast, triggerConfirm }) => {
   const [legalFiscalCentre, setLegalFiscalCentre] = useState('');
   const [legalActivity, setLegalActivity] = useState('');
 
+  const [footerDesc, setFooterDesc]           = useState('');
+  const [footerCopyright, setFooterCopyright] = useState('');
+
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword]         = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -53,6 +56,8 @@ const Parametres = ({ triggerToast, triggerConfirm }) => {
       setLegalCapital(data.legal_capital || '');
       setLegalFiscalCentre(data.legal_fiscal_centre || '');
       setLegalActivity(data.legal_activity || '');
+      setFooterDesc(data.footer_description || '');
+      setFooterCopyright(data.footer_copyright || '2025 Expertise Senegal - Etudes · Conseil · Formation');
     } catch {
       triggerToast('Erreur chargement des parametres.', 'error');
     } finally {
@@ -82,6 +87,8 @@ const Parametres = ({ triggerToast, triggerConfirm }) => {
           legal_capital: legalCapital,
           legal_fiscal_centre: legalFiscalCentre,
           legal_activity: legalActivity,
+          footer_description: footerDesc,
+          footer_copyright: footerCopyright,
         });
         triggerToast('Parametres mis a jour avec succes.');
       } catch {
@@ -237,6 +244,18 @@ const Parametres = ({ triggerToast, triggerConfirm }) => {
           <div className="form-group mb-4">
             <label>Activite declaree</label>
             <input type="text" value={legalActivity} onChange={e => setLegalActivity(e.target.value)} />
+          </div>
+
+          <div className="golden-divider" style={{ margin: '30px 0' }}></div>
+
+          <h3>Footer du site</h3>
+          <div className="form-group mb-4">
+            <label>Description du cabinet (texte sous le logo)</label>
+            <textarea rows="3" value={footerDesc} onChange={e => setFooterDesc(e.target.value)} placeholder="Cabinet pluridisciplinaire de conseil..." />
+          </div>
+          <div className="form-group mb-4">
+            <label>Ligne copyright <span style={{ fontSize: '0.78rem', color: '#6b7280', fontWeight: 400 }}>(sans le © — ex: 2025 Expertise Senegal - Etudes · Conseil · Formation)</span></label>
+            <input type="text" value={footerCopyright} onChange={e => setFooterCopyright(e.target.value)} />
           </div>
 
           <button className="admin-btn admin-btn-secondary" onClick={handleSave}>
