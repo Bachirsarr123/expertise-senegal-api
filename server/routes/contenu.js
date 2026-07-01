@@ -91,7 +91,18 @@ const defaultContent = [
   { page: 'domaines', section: 'domaine4', cle: 'intro', valeur: 'Nous concevons et animons des programmes de formation pour développer le capital humain.', type: 'texte' },
   { page: 'domaines', section: 'domaine4', cle: 'prestations', valeur: '["Ingénierie de formation : élaboration de plans de formation et référentiels de compétences","Formations intra-organisation : sessions sur mesure adaptées aux besoins de la structure","Formations inter-organisations : séminaires d’excellence favorisant le partage d’expériences","Formations sur site : déploiement d’ateliers pratiques directement dans vos locaux ou régions"]', type: 'texte' },
   { page: 'domaines', section: 'domaine4', cle: 'themes', valeur: '["Finance Publique","Gestion de Projet","Marchés Publics","Soft Skills","Communication","Management","Informatique"]', type: 'texte' },
-  { page: 'domaines', section: 'domaine4', cle: 'active', valeur: 'true', type: 'boolean' }
+  { page: 'domaines', section: 'domaine4', cle: 'active', valeur: 'true', type: 'boolean' },
+
+  // --- CONTACT ---
+  { page: 'contact', section: 'hero', cle: 'badge', valeur: 'CONTACT - EXPERTISE SENEGAL', type: 'texte' },
+  { page: 'contact', section: 'hero', cle: 'title_white', valeur: 'Contactez', type: 'texte' },
+  { page: 'contact', section: 'hero', cle: 'title_gold', valeur: 'Notre Cabinet', type: 'texte' },
+  { page: 'contact', section: 'hero', cle: 'subtitle', valeur: 'Vous avez un projet, une mission ou une demande de formation ? Notre equipe est disponible pour vous accompagner.', type: 'texte' },
+  { page: 'contact', section: 'formation', cle: 'badge', valeur: '- POLE FORMATION -', type: 'texte' },
+  { page: 'contact', section: 'formation', cle: 'title', valeur: 'Demander une Formation', type: 'texte' },
+  { page: 'contact', section: 'formation', cle: 'subtitle', valeur: 'Expertise Senegal propose des formations intra-organisation, inter-organisations et sur site dans toutes les regions du Senegal.', type: 'texte' },
+  { page: 'contact', section: 'cta', cle: 'title', valeur: 'Pret a demarrer votre projet ?', type: 'texte' },
+  { page: 'contact', section: 'cta', cle: 'subtitle', valeur: "Contactez-nous des aujourd'hui pour un accompagnement personnalise", type: 'texte' }
 ];
 
 // Helper to seed db content if empty

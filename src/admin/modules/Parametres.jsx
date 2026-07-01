@@ -1,33 +1,31 @@
-﻿import { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import axiosInstance from '../utils/axiosInstance';
 
 const Parametres = ({ triggerToast, triggerConfirm }) => {
   const [loading, setLoading] = useState(true);
 
-  // Site
   const [siteName, setSiteName]         = useState('');
   const [siteSlogan, setSiteSlogan]     = useState('');
   const [maintenanceMode, setMaintenanceMode] = useState(false);
 
-  // Contact
   const [contactPhone, setContactPhone]   = useState('');
   const [contactEmail, setContactEmail]   = useState('');
   const [contactAddress, setContactAddress] = useState('');
 
-  // WhatsApp & Horaires
   const [whatsappNumber, setWhatsappNumber] = useState('');
   const [hoursMonFri, setHoursMonFri]       = useState('');
   const [hoursSat, setHoursSat]             = useState('');
   const [hoursSun, setHoursSun]             = useState('');
 
-  // Legal
-  const [legalRC, setLegalRC]                   = useState('');
-  const [legalNinea, setLegalNinea]             = useState('');
-  const [legalCapital, setLegalCapital]         = useState('');
+  const [directorName, setDirectorName]   = useState('');
+  const [legalForm, setLegalForm]         = useState('');
+  const [foundingDate, setFoundingDate]   = useState('');
+  const [legalRC, setLegalRC]             = useState('');
+  const [legalNinea, setLegalNinea]       = useState('');
+  const [legalCapital, setLegalCapital]   = useState('');
   const [legalFiscalCentre, setLegalFiscalCentre] = useState('');
-  const [legalActivity, setLegalActivity]       = useState('');
+  const [legalActivity, setLegalActivity] = useState('');
 
-  // Password
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword]         = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -47,6 +45,9 @@ const Parametres = ({ triggerToast, triggerConfirm }) => {
       setHoursMonFri(data.hours_mon_fri || '08h00 - 18h00');
       setHoursSat(data.hours_sat || '09h00 - 13h00');
       setHoursSun(data.hours_sun || 'Ferme');
+      setDirectorName(data.director_name || 'Boussirou DIALLO');
+      setLegalForm(data.legal_form || 'SARL');
+      setFoundingDate(data.founding_date || '22/11/2016');
       setLegalRC(data.legal_rc || '');
       setLegalNinea(data.legal_ninea || '');
       setLegalCapital(data.legal_capital || '');
@@ -73,6 +74,9 @@ const Parametres = ({ triggerToast, triggerConfirm }) => {
           hours_mon_fri: hoursMonFri,
           hours_sat: hoursSat,
           hours_sun: hoursSun,
+          director_name: directorName,
+          legal_form: legalForm,
+          founding_date: foundingDate,
           legal_rc: legalRC,
           legal_ninea: legalNinea,
           legal_capital: legalCapital,
@@ -110,7 +114,6 @@ const Parametres = ({ triggerToast, triggerConfirm }) => {
   return (
     <div className="gestion-parametres-module">
 
-      {/* GENERAL */}
       <div className="admin-card">
         <h2 className="admin-card-title">Parametres generaux du site</h2>
         <div className="admin-form">
@@ -142,7 +145,6 @@ const Parametres = ({ triggerToast, triggerConfirm }) => {
 
           <div className="golden-divider" style={{ margin: '30px 0' }}></div>
 
-          {/* COORDONNEES */}
           <h3>Coordonnees de l'entreprise</h3>
           <div className="admin-input-grid mb-4">
             <div className="form-group">
@@ -161,7 +163,6 @@ const Parametres = ({ triggerToast, triggerConfirm }) => {
 
           <div className="golden-divider" style={{ margin: '30px 0' }}></div>
 
-          {/* WHATSAPP & HORAIRES */}
           <h3>WhatsApp & Horaires d'ouverture</h3>
           <div className="form-group mb-4">
             <label>Numero WhatsApp <span style={{ fontSize: '0.78rem', color: '#6b7280', fontWeight: 400 }}>(chiffres uniquement, ex: 221776434160)</span></label>
@@ -194,7 +195,24 @@ const Parametres = ({ triggerToast, triggerConfirm }) => {
 
           <div className="golden-divider" style={{ margin: '30px 0' }}></div>
 
-          {/* LEGAL */}
+          <h3>Identite du Cabinet</h3>
+          <div className="admin-input-grid mb-4">
+            <div className="form-group">
+              <label>Nom du Directeur</label>
+              <input type="text" value={directorName} onChange={e => setDirectorName(e.target.value)} placeholder="Boussirou DIALLO" />
+            </div>
+            <div className="form-group">
+              <label>Forme Juridique</label>
+              <input type="text" value={legalForm} onChange={e => setLegalForm(e.target.value)} placeholder="SARL" />
+            </div>
+          </div>
+          <div className="form-group mb-4">
+            <label>Date de Creation</label>
+            <input type="text" value={foundingDate} onChange={e => setFoundingDate(e.target.value)} placeholder="22/11/2016" style={{ maxWidth: '280px' }} />
+          </div>
+
+          <div className="golden-divider" style={{ margin: '30px 0' }}></div>
+
           <h3>Informations Administratives & Legales</h3>
           <div className="admin-input-grid mb-4">
             <div className="form-group">
@@ -227,7 +245,6 @@ const Parametres = ({ triggerToast, triggerConfirm }) => {
         </div>
       </div>
 
-      {/* PASSWORD */}
       <div className="admin-card">
         <h2 className="admin-card-title">Securite - Modifier le mot de passe</h2>
         <form onSubmit={handleChangePassword} className="admin-form">

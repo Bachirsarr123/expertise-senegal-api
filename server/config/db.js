@@ -1,4 +1,4 @@
-﻿const mysql = require('mysql2/promise');
+const mysql = require('mysql2/promise');
 const bcrypt = require('bcrypt');
 require('dotenv').config();
 
@@ -155,7 +155,10 @@ async function createTables() {
       { cle: 'whatsapp_number', valeur: '221776434160' },
       { cle: 'hours_mon_fri', valeur: '08h00 - 18h00' },
       { cle: 'hours_sat', valeur: '09h00 - 13h00' },
-      { cle: 'hours_sun', valeur: 'Ferme' }
+      { cle: 'hours_sun', valeur: 'Ferme' },
+      { cle: 'director_name', valeur: 'Boussirou DIALLO' },
+      { cle: 'legal_form', valeur: 'SARL' },
+      { cle: 'founding_date', valeur: '22/11/2016' }
     ];
 
     for (const setting of defaultSettings) {

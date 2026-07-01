@@ -1,4 +1,4 @@
-﻿import { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import logoImg from '../assets/logo.png';
 import './Dashboard.css';
@@ -11,6 +11,7 @@ import GestionPublications from './modules/GestionPublications';
 import GestionInscriptions from './modules/GestionInscriptions';
 import GestionMessages from './modules/GestionMessages';
 import GestionMedias from './modules/GestionMedias';
+import GestionContact from './modules/GestionContact';
 import Parametres from './modules/Parametres';
 
 import axiosInstance from './utils/axiosInstance'; // We'll create a small axios instance with JWT header
@@ -154,6 +155,12 @@ const Dashboard = () => {
           </button>
 
           <button 
+            className={`nav-item-btn ${activeTab === 'contact' ? 'active' : ''}`}
+            onClick={() => setActiveTab('contact')}
+          >
+            <span className="nav-icon">&#128196;</span> Page Contact
+          </button>
+          <button 
             className={`nav-item-btn ${activeTab === 'messages' ? 'active' : ''}`}
             onClick={() => setActiveTab('messages')}
           >
@@ -279,6 +286,11 @@ const Dashboard = () => {
           {/* Module 3.6: Inscriptions */}
           {activeTab === 'inscriptions' && (
             <GestionInscriptions triggerToast={triggerToast} triggerConfirm={triggerConfirm} />
+          )}
+
+          {/* Module 3.7: Contact page */}
+          {activeTab === 'contact' && (
+            <GestionContact triggerToast={triggerToast} triggerConfirm={triggerConfirm} />
           )}
 
           {/* Module 4: Messages */}
