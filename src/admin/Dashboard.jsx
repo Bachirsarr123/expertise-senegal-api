@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+﻿import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import logoImg from '../assets/logo.png';
 import './Dashboard.css';
@@ -8,6 +8,7 @@ import GestionAccueil from './modules/GestionAccueil';
 import GestionAPropos from './modules/GestionAPropos';
 import GestionDomaines from './modules/GestionDomaines';
 import GestionPublications from './modules/GestionPublications';
+import GestionInscriptions from './modules/GestionInscriptions';
 import GestionMessages from './modules/GestionMessages';
 import GestionMedias from './modules/GestionMedias';
 import Parametres from './modules/Parametres';
@@ -20,7 +21,8 @@ const Dashboard = () => {
     unreadMessages: 0,
     lastUpdate: 'Chargement...',
     uploadedPhotos: 0,
-    activeSections: 0
+    activeSections: 0,
+    newInscriptions: 0
   });
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [confirmAction, setConfirmAction] = useState({ onConfirm: () => {}, message: '' });
@@ -40,6 +42,10 @@ const Dashboard = () => {
       // Fetch medias for stats
       const mediaRes = await axiosInstance.get('/api/media');
       const photoCount = mediaRes.data.length;
+
+      // Fetch new inscriptions count
+      const inscRes = await axiosInstance.get('/api/inscriptions');
+      const newInscr = inscRes.data.filter(i => i.statut === 'nouveau').length;
 
       // Fetch content for stats
       const contentRes = await axiosInstance.get('/api/content/all');
@@ -63,7 +69,8 @@ const Dashboard = () => {
         unreadMessages: unread,
         lastUpdate: new Date().toLocaleDateString('fr-FR'),
         uploadedPhotos: photoCount,
-        activeSections: activeSecs
+        activeSections: activeSecs,
+        newInscriptions: newInscr
       });
     } catch (error) {
       console.error('Error fetching dashboard stats:', error);
@@ -267,6 +274,11 @@ const Dashboard = () => {
           {/* Module 3.5: Publications */}
           {activeTab === 'publications' && (
             <GestionPublications triggerToast={triggerToast} triggerConfirm={triggerConfirm} />
+          )}
+
+          {/* Module 3.6: Inscriptions */}
+          {activeTab === 'inscriptions' && (
+            <GestionInscriptions triggerToast={triggerToast} triggerConfirm={triggerConfirm} />
           )}
 
           {/* Module 4: Messages */}
