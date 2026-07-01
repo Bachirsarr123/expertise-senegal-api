@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import axiosInstance from '../utils/axiosInstance';
+import ImageUploadButton from '../components/ImageUploadButton';
 
 const GestionAPropos = ({ triggerToast, triggerConfirm }) => {
   const [loading, setLoading] = useState(true);
@@ -11,6 +12,7 @@ const GestionAPropos = ({ triggerToast, triggerConfirm }) => {
   const [heroSubtitle, setHeroSubtitle] = useState('');
 
   const [presentationTitle, setPresentationTitle] = useState('');
+  const [presentationImage, setPresentationImage] = useState('');
   const [presentationText, setPresentationText] = useState('');
 
   const [visionTitle, setVisionTitle] = useState('');
@@ -52,6 +54,7 @@ const GestionAPropos = ({ triggerToast, triggerConfirm }) => {
       if (data.presentation) {
         setPresentationTitle(data.presentation.title || '');
         setPresentationText(data.presentation.text || '');
+        setPresentationImage(data.presentation.image || '');
       }
 
       // Vision
@@ -103,6 +106,7 @@ const GestionAPropos = ({ triggerToast, triggerConfirm }) => {
           { page: 'apropos', section: 'hero', cle: 'subtitle', valeur: heroSubtitle, type: 'texte' },
           { page: 'apropos', section: 'presentation', cle: 'title', valeur: presentationTitle, type: 'texte' },
           { page: 'apropos', section: 'presentation', cle: 'text', valeur: presentationText, type: 'texte' },
+          { page: 'apropos', section: 'presentation', cle: 'image', valeur: presentationImage, type: 'image' },
           { page: 'apropos', section: 'vision', cle: 'title', valeur: visionTitle, type: 'texte' },
           { page: 'apropos', section: 'vision', cle: 'points', valeur: JSON.stringify(visionPoints), type: 'texte' },
           { page: 'apropos', section: 'atouts', cle: 'title', valeur: atoutsTitle, type: 'texte' },
@@ -202,6 +206,16 @@ const GestionAPropos = ({ triggerToast, triggerConfirm }) => {
           <div className="form-group mb-4">
             <label>Texte de Présentation ("Qui sommes-nous ?")</label>
             <textarea rows="6" value={presentationText} onChange={e => setPresentationText(e.target.value)}></textarea>
+          </div>
+
+          <div className="form-group mb-4">
+            <label>Photo de presentation (section "Qui sommes-nous ?")</label>
+            <ImageUploadButton
+              currentUrl={presentationImage}
+              onSuccess={(url) => setPresentationImage(url)}
+              label="Uploader une nouvelle photo"
+            />
+            <input type="text" value={presentationImage} onChange={e => setPresentationImage(e.target.value)} placeholder="https://... ou URL Cloudinary" style={{ marginTop: '8px' }} />
           </div>
 
           <div className="form-actions-bar">

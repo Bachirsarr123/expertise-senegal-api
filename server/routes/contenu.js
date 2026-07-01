@@ -16,6 +16,7 @@ const defaultContent = [
   { page: 'accueil', section: 'hero', cle: 'cta_secondary_text', valeur: 'Découvrir le Cabinet', type: 'texte' },
   { page: 'accueil', section: 'hero', cle: 'cta_secondary_link', valeur: '/a-propos', type: 'texte' },
   { page: 'accueil', section: 'hero', cle: 'bg_image', valeur: '/src/assets/hero.png', type: 'image' },
+  { page: 'accueil', section: 'hero', cle: 'bg_image', valeur: 'https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&q=80', type: 'image' },
   { page: 'accueil', section: 'hero', cle: 'active', valeur: 'true', type: 'boolean' },
 
   // Chiffres Clés
@@ -48,6 +49,7 @@ const defaultContent = [
 
   // Presentation
   { page: 'apropos', section: 'presentation', cle: 'title', valeur: 'Qui sommes-nous ?', type: 'texte' },
+  { page: 'apropos', section: 'presentation', cle: 'image', valeur: 'https://images.unsplash.com/photo-1600880292203-757bb62b4baf?auto=format&fit=crop&q=80', type: 'image' },
   { page: 'apropos', section: 'presentation', cle: 'text', valeur: 'Expertise Sénégal est un cabinet de Formation, Conseil et Études pluridisciplinaire, spécialisé dans l’évaluation de projets, l’audit et contrôle, ainsi que dans le renforcement des capacités à travers la formation continue et l’assistance technique. Fondé en 2016, le cabinet incarne une expertise éprouvée, mobilisant des experts hautement qualifiés.', type: 'texte' },
 
   // Vision
@@ -107,6 +109,7 @@ const defaultContent = [
   // --- SEMINAIRES ---
   { page: 'seminaires', section: 'hero', cle: 'badge', valeur: 'SEMINAIRES & FORMATIONS - EXPERTISE SENEGAL', type: 'texte' },
   { page: 'seminaires', section: 'hero', cle: 'title', valeur: 'Seminaires & Formations', type: 'texte' },
+  { page: 'seminaires', section: 'hero', cle: 'bg_image', valeur: 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&q=80&w=1920', type: 'image' },
   { page: 'seminaires', section: 'hero', cle: 'subtitle', valeur: 'Retrouvez toutes nos formations continues, seminaires professionnels, appels a candidatures et actualites.', type: 'texte' }
 ];
 

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import axiosInstance from '../utils/axiosInstance';
+import ImageUploadButton from '../components/ImageUploadButton';
 
 const GestionAccueil = ({ triggerToast, triggerConfirm }) => {
   const [loading, setLoading] = useState(true);
@@ -305,7 +306,12 @@ const GestionAccueil = ({ triggerToast, triggerConfirm }) => {
 
           <div className="form-group mb-4">
             <label>Lien de la photo de fond</label>
-            <input type="text" value={heroBgImage} onChange={e => setHeroBgImage(e.target.value)} placeholder="/src/assets/hero.png" />
+            <ImageUploadButton
+              currentUrl={heroBgImage}
+              onSuccess={(url) => setHeroBgImage(url)}
+              label="Uploader une nouvelle image de fond"
+            />
+            <input type="text" value={heroBgImage} onChange={e => setHeroBgImage(e.target.value)} placeholder="https://... ou URL Cloudinary" style={{ marginTop: '8px' }} />
             <span className="info-subtext">Astuce: Vous pouvez copier le lien de n'importe quelle photo depuis l'onglet "Médias" et le coller ici.</span>
           </div>
 

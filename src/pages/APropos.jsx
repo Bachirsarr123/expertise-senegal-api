@@ -1,9 +1,23 @@
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import axios from 'axios';
 import SEO from '../components/SEO';
 import ImageOptimisee from '../components/ImageOptimisee';
 import './APropos.css';
 
 const APropos = () => {
+  const [presentationImage, setPresentationImage] = useState('https://images.unsplash.com/photo-1600880292203-757bb62b4baf?auto=format&fit=crop&q=80');
+
+  useEffect(() => {
+    axios.get('https://expertise-senegal-api-olf5.onrender.com/api/content/all')
+      .then(({ data }) => {
+        if (data.apropos && data.apropos.presentation && data.apropos.presentation.image) {
+          setPresentationImage(data.apropos.presentation.image);
+        }
+      })
+      .catch(() => {});
+  }, []);
+
   return (
     <div className="apropos-page">
       <SEO 
@@ -40,7 +54,7 @@ const APropos = () => {
           </div>
           <div className="presentation-image">
             <ImageOptimisee
-              src="https://images.unsplash.com/photo-1600880292203-757bb62b4baf?auto=format&fit=crop&q=80"
+              src={presentationImage}
               alt="Notre équipe au travail"
               className="img-fluid rounded shadow"
               style={{ borderRadius: '12px' }}

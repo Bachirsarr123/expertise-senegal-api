@@ -9,6 +9,7 @@ const Seminaires = () => {
   const [publications, setPublications] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeFilter, setActiveFilter] = useState('formation');
+  const [heroBgImage, setHeroBgImage] = useState('https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&q=80&w=1920');
   const [heroBadge, setHeroBadge] = useState('SEMINAIRES & FORMATIONS - EXPERTISE SENEGAL');
   const [heroTitle, setHeroTitle] = useState('Seminaires & Formations');
   const [heroSubtitle, setHeroSubtitle] = useState('Retrouvez toutes nos formations continues, seminaires professionnels, appels a candidatures et actualites.');
@@ -36,6 +37,7 @@ const Seminaires = () => {
       if (data.seminaires && data.seminaires.hero) {
         const h = data.seminaires.hero;
         if (h.badge) setHeroBadge(h.badge);
+        if (h.bg_image) setHeroBgImage(h.bg_image);
         if (h.title) setHeroTitle(h.title);
         if (h.subtitle) setHeroSubtitle(h.subtitle);
       }
@@ -56,7 +58,7 @@ const Seminaires = () => {
         url="https://www.expertisesenegal.com/seminaires"
       />
       {/* Banner */}
-      <section className="seminaires-hero">
+      <section className="seminaires-hero" style={{ backgroundImage: `url(${heroBgImage})` }}>
         <div className="seminaires-hero-overlay"></div>
         <div className="container seminaires-hero-content">
           <div className="seminaires-hero-badge">{heroBadge}</div>

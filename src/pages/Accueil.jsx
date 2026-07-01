@@ -7,10 +7,12 @@ import './Accueil.css';
 
 const Accueil = () => {
   const [spotlight, setSpotlight] = useState(null);
+  const [heroBgImage, setHeroBgImage] = useState('https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&q=80');
   const [annonces, setAnnonces] = useState([]);
 
   useEffect(() => {
     fetchAnnonces();
+    fetchHeroImage();
   }, []);
 
   const fetchAnnonces = async () => {
@@ -25,6 +27,17 @@ const Accueil = () => {
     }
   };
 
+  const fetchHeroImage = async () => {
+    try {
+      const { data } = await axios.get('https://expertise-senegal-api-olf5.onrender.com/api/content/all');
+      if (data.accueil && data.accueil.hero && data.accueil.hero.bg_image) {
+        setHeroBgImage(data.accueil.hero.bg_image);
+      }
+    } catch (err) {
+      console.warn('Could not load hero background image.');
+    }
+  };
+
   return (
     <div className="accueil">
       <SEO 
@@ -33,7 +46,7 @@ const Accueil = () => {
         url="https://www.expertisesenegal.com"
       />
       {/* 2. HERO */}
-      <section className="hero-section">
+      <section className="hero-section" style={{ backgroundImage: `url(${heroBgImage})` }}>
         <div className="hero-overlay"></div>
         <div className="container hero-content">
           <div className="hero-badge">
@@ -220,7 +233,18 @@ const Accueil = () => {
                   badgeClass = 'badge-actualite';
                 }
 
-                return (
+                const fetchHeroImage = async () => {
+    try {
+      const { data } = await axios.get('https://expertise-senegal-api-olf5.onrender.com/api/content/all');
+      if (data.accueil && data.accueil.hero && data.accueil.hero.bg_image) {
+        setHeroBgImage(data.accueil.hero.bg_image);
+      }
+    } catch (err) {
+      console.warn('Could not load hero background image.');
+    }
+  };
+
+  return (
                   <div key={item.id} className="annonce-card">
                     <div className="annonce-img-container">
                       <ImageOptimisee 

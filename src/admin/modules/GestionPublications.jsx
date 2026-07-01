@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import axiosInstance from '../utils/axiosInstance';
+import ImageUploadButton from '../components/ImageUploadButton';
 
 const GestionPublications = ({ triggerToast, triggerConfirm }) => {
   const [publications, setPublications] = useState([]);
@@ -16,6 +17,7 @@ const GestionPublications = ({ triggerToast, triggerConfirm }) => {
 
   // Seminaires page hero content
   const [heroBadge, setHeroBadge] = useState('');
+  const [heroBgImage, setHeroBgImage] = useState('');
   const [heroTitle, setHeroTitle] = useState('');
   const [heroSubtitle, setHeroSubtitle] = useState('');
   const [filterStatut, setFilterStatut] = useState('all');
@@ -64,6 +66,7 @@ const GestionPublications = ({ triggerToast, triggerConfirm }) => {
         const h = data.seminaires.hero;
         setHeroBadge(h.badge || 'SEMINAIRES & FORMATIONS - EXPERTISE SENEGAL');
         setHeroTitle(h.title || 'Seminaires & Formations');
+        setHeroBgImage(h.bg_image || '');
         setHeroSubtitle(h.subtitle || '');
       }
     } catch {
@@ -79,6 +82,7 @@ const GestionPublications = ({ triggerToast, triggerConfirm }) => {
             { page: 'seminaires', section: 'hero', cle: 'badge', valeur: heroBadge, type: 'texte' },
             { page: 'seminaires', section: 'hero', cle: 'title', valeur: heroTitle, type: 'texte' },
             { page: 'seminaires', section: 'hero', cle: 'subtitle', valeur: heroSubtitle, type: 'texte' },
+            { page: 'seminaires', section: 'hero', cle: 'bg_image', valeur: heroBgImage, type: 'image' },
           ]
         });
         triggerToast('Textes page Seminaires mis a jour.');
