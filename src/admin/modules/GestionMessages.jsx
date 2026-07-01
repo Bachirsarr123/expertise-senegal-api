@@ -91,7 +91,7 @@ const GestionMessages = ({ triggerToast, triggerConfirm, onMessageAction }) => {
   const handleExportCSV = () => {
     // Standard CSV download trigger from our express CSV export endpoint
     const token = localStorage.getItem('adminToken');
-    window.open(`https://expertise-senegal-api.onrender.com/api/messages/export?token=${token || ''}`, '_blank');
+    window.open(`https://expertise-senegal-api-olf5.onrender.com/api/messages/export?token=${token || ''}`, '_blank');
     triggerToast('Téléchargement du fichier CSV démarré.');
   };
 

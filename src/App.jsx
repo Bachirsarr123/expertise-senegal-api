@@ -32,7 +32,7 @@ function App() {
 
   const checkMaintenanceMode = async () => {
     try {
-      const response = await axios.get('https://expertise-senegal-api.onrender.com/api/content/parametres');
+      const response = await axios.get('https://expertise-senegal-api-olf5.onrender.com/api/content/parametres');
       if (response.data.maintenance_mode === 'true') {
         // Only trigger maintenance if we are NOT on an admin route
         const isAdminRoute = window.location.pathname.startsWith('/admin');

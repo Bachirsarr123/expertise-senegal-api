@@ -29,7 +29,7 @@ const SeminaireDetail = () => {
 
   const fetchDetail = async () => {
     try {
-      const response = await axios.get(`https://expertise-senegal-api.onrender.com/api/publications/${id}`);
+      const response = await axios.get(`https://expertise-senegal-api-olf5.onrender.com/api/publications/${id}`);
       setPub(response.data);
       setLoading(false);
     } catch (err) {
@@ -51,7 +51,7 @@ const SeminaireDetail = () => {
     setErrorMsg('');
 
     try {
-      await axios.post('https://expertise-senegal-api.onrender.com/api/inscriptions', {
+      await axios.post('https://expertise-senegal-api-olf5.onrender.com/api/inscriptions', {
         publication_id: id,
         nom,
         prenom,

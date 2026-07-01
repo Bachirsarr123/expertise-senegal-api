@@ -21,7 +21,7 @@ const Footer = () => {
 
   const fetchParams = async () => {
     try {
-      const response = await axios.get('https://expertise-senegal-api.onrender.com/api/content/parametres');
+      const response = await axios.get('https://expertise-senegal-api-olf5.onrender.com/api/content/parametres');
       if (response.data.contact_phone) setPhone(response.data.contact_phone);
       if (response.data.contact_email) setEmail(response.data.contact_email);
       if (response.data.contact_address) setAddress(response.data.contact_address);
