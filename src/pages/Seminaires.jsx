@@ -9,9 +9,13 @@ const Seminaires = () => {
   const [publications, setPublications] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeFilter, setActiveFilter] = useState('formation');
+  const [heroBadge, setHeroBadge] = useState('SEMINAIRES & FORMATIONS - EXPERTISE SENEGAL');
+  const [heroTitle, setHeroTitle] = useState('Seminaires & Formations');
+  const [heroSubtitle, setHeroSubtitle] = useState('Retrouvez toutes nos formations continues, seminaires professionnels, appels a candidatures et actualites.');
 
   useEffect(() => {
     fetchPublications();
+    fetchHeroContent();
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, []);
 
@@ -23,6 +27,20 @@ const Seminaires = () => {
     } catch (error) {
       console.error('Error fetching public publications:', error);
       setLoading(false);
+    }
+  };
+
+  const fetchHeroContent = async () => {
+    try {
+      const { data } = await axios.get('https://expertise-senegal-api-olf5.onrender.com/api/content/all');
+      if (data.seminaires && data.seminaires.hero) {
+        const h = data.seminaires.hero;
+        if (h.badge) setHeroBadge(h.badge);
+        if (h.title) setHeroTitle(h.title);
+        if (h.subtitle) setHeroSubtitle(h.subtitle);
+      }
+    } catch (err) {
+      console.warn('Could not load seminaires hero content.');
     }
   };
 
@@ -41,9 +59,9 @@ const Seminaires = () => {
       <section className="seminaires-hero">
         <div className="seminaires-hero-overlay"></div>
         <div className="container seminaires-hero-content">
-          <div className="seminaires-hero-badge">● SÉMINAIRES &amp; FORMATIONS — EXPERTISE SÉNÉGAL</div>
-          <h1>Séminaires &amp; Formations</h1>
-          <p>Retrouvez toutes nos formations continues, séminaires professionnels, appels à candidatures et actualités.</p>
+          <div className="seminaires-hero-badge">{heroBadge}</div>
+          <h1>{heroTitle}</h1>
+          <p>{heroSubtitle}</p>
         </div>
       </section>
 

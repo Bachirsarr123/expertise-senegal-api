@@ -13,6 +13,11 @@ const GestionPublications = ({ triggerToast, triggerConfirm }) => {
 
   // Filters
   const [filterType, setFilterType] = useState('formation');
+
+  // Seminaires page hero content
+  const [heroBadge, setHeroBadge] = useState('');
+  const [heroTitle, setHeroTitle] = useState('');
+  const [heroSubtitle, setHeroSubtitle] = useState('');
   const [filterStatut, setFilterStatut] = useState('all');
 
   // Group Email Form State
@@ -36,6 +41,7 @@ const GestionPublications = ({ triggerToast, triggerConfirm }) => {
 
   useEffect(() => {
     fetchPublications();
+    fetchHeroContent();
   }, []);
 
   const fetchPublications = async () => {
@@ -49,7 +55,39 @@ const GestionPublications = ({ triggerToast, triggerConfirm }) => {
       triggerToast('Impossible de charger les publications.', 'error');
       setLoading(false);
     }
+  }
+
+  const fetchHeroContent = async () => {
+    try {
+      const { data } = await axiosInstance.get('/api/content/all');
+      if (data.seminaires && data.seminaires.hero) {
+        const h = data.seminaires.hero;
+        setHeroBadge(h.badge || 'SEMINAIRES & FORMATIONS - EXPERTISE SENEGAL');
+        setHeroTitle(h.title || 'Seminaires & Formations');
+        setHeroSubtitle(h.subtitle || '');
+      }
+    } catch {
+      triggerToast('Erreur chargement hero Seminaires.', 'error');
+    }
   };
+
+  const saveHeroContent = () => {
+    triggerConfirm('Enregistrer les textes de la page Seminaires ?', async () => {
+      try {
+        await axiosInstance.post('/api/content/save', {
+          contents: [
+            { page: 'seminaires', section: 'hero', cle: 'badge', valeur: heroBadge, type: 'texte' },
+            { page: 'seminaires', section: 'hero', cle: 'title', valeur: heroTitle, type: 'texte' },
+            { page: 'seminaires', section: 'hero', cle: 'subtitle', valeur: heroSubtitle, type: 'texte' },
+          ]
+        });
+        triggerToast('Textes page Seminaires mis a jour.');
+      } catch {
+        triggerToast('Erreur sauvegarde.', 'error');
+      }
+    });
+  };
+;
 
   const fetchInscriptions = async (pubId) => {
     try {
@@ -131,6 +169,7 @@ const GestionPublications = ({ triggerToast, triggerConfirm }) => {
         triggerToast('Publication modifiée avec succès.');
       }
       fetchPublications();
+    fetchHeroContent();
       setView('list');
     } catch (error) {
       console.error('Error saving publication:', error);
@@ -144,6 +183,7 @@ const GestionPublications = ({ triggerToast, triggerConfirm }) => {
         await axiosInstance.delete(`/api/publications/${id}`);
         triggerToast('Publication supprimée.');
         fetchPublications();
+    fetchHeroContent();
       } catch (error) {
         console.error('Error deleting publication:', error);
         triggerToast('Erreur lors de la suppression.', 'error');
@@ -157,6 +197,7 @@ const GestionPublications = ({ triggerToast, triggerConfirm }) => {
       await axiosInstance.patch(`/api/publications/${pub.id}/statut`, { statut: nextStatut });
       triggerToast(nextStatut === 'publie' ? 'Publication mise en ligne.' : 'Publication passée en brouillon.');
       fetchPublications();
+    fetchHeroContent();
     } catch (error) {
       console.error('Error changing publication status:', error);
       triggerToast('Erreur de changement de statut.', 'error');
@@ -181,7 +222,8 @@ const GestionPublications = ({ triggerToast, triggerConfirm }) => {
         await axiosInstance.delete(`/api/inscriptions/${inscritId}`);
         triggerToast('Inscription supprimée.');
         fetchInscriptions(selectedPubForInscriptions.id);
-        fetchPublications(); // Update places count
+        fetchPublications();
+    fetchHeroContent(); // Update places count
       } catch (error) {
         console.error('Error deleting inscrit:', error);
         triggerToast('Erreur lors de la suppression.', 'error');

@@ -102,7 +102,12 @@ const defaultContent = [
   { page: 'contact', section: 'formation', cle: 'title', valeur: 'Demander une Formation', type: 'texte' },
   { page: 'contact', section: 'formation', cle: 'subtitle', valeur: 'Expertise Senegal propose des formations intra-organisation, inter-organisations et sur site dans toutes les regions du Senegal.', type: 'texte' },
   { page: 'contact', section: 'cta', cle: 'title', valeur: 'Pret a demarrer votre projet ?', type: 'texte' },
-  { page: 'contact', section: 'cta', cle: 'subtitle', valeur: "Contactez-nous des aujourd'hui pour un accompagnement personnalise", type: 'texte' }
+  { page: 'contact', section: 'cta', cle: 'subtitle', valeur: "Contactez-nous des aujourd'hui pour un accompagnement personnalise", type: 'texte' },
+
+  // --- SEMINAIRES ---
+  { page: 'seminaires', section: 'hero', cle: 'badge', valeur: 'SEMINAIRES & FORMATIONS - EXPERTISE SENEGAL', type: 'texte' },
+  { page: 'seminaires', section: 'hero', cle: 'title', valeur: 'Seminaires & Formations', type: 'texte' },
+  { page: 'seminaires', section: 'hero', cle: 'subtitle', valeur: 'Retrouvez toutes nos formations continues, seminaires professionnels, appels a candidatures et actualites.', type: 'texte' }
 ];
 
 // Helper to seed db content if empty
