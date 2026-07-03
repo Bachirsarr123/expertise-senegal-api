@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+﻿import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import axios from 'axios';
 import SEO from '../components/SEO';
@@ -221,6 +221,40 @@ const SeminaireDetail = () => {
                 )}
               </div>
             </div>
+
+            {/* Document joint */}
+            {pub.document_url && (() => {
+              const isPdf = pub.document_url.match(/\.pdf(\?|$)/i) || pub.document_url.includes('.pdf');
+              const isWord = pub.document_url.match(/\.(docx?)(\?|$)/i);
+              const fileName = decodeURIComponent(pub.document_url.split('/').pop().split('?')[0]);
+              return (
+                <div className="pub-document-section">
+                  <h2 className="content-h2">📎 Document joint</h2>
+                  <div className="pub-document-card">
+                    <div className="pub-document-header">
+                      <span className="doc-icon">{isWord ? '📄' : '📕'}</span>
+                      <div className="doc-info">
+                        <p className="doc-name">{fileName}</p>
+                        <p className="doc-type">{isWord ? 'Document Word' : 'Document PDF'}</p>
+                      </div>
+                      <a href={pub.document_url} download target="_blank" rel="noopener noreferrer" className="btn btn-download">
+                        ⬇️ Télécharger
+                      </a>
+                    </div>
+                    {isPdf && (
+                      <div className="pub-pdf-viewer">
+                        <iframe
+                          src={pub.document_url}
+                          title="Document"
+                          className="pdf-iframe"
+                          frameBorder="0"
+                        />
+                      </div>
+                    )}
+                  </div>
+                </div>
+              );
+            })()}
 
           </div>
 

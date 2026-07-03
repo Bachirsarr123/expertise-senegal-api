@@ -1,4 +1,4 @@
-const express = require('express');
+﻿const express = require('express');
 const router = express.Router();
 const multer = require('multer');
 const path = require('path');
@@ -96,4 +96,38 @@ router.delete('/:id', authMiddleware, async (req, res) => {
   }
 });
 
+
+// POST upload document (PDF/Word) to Cloudinary
+const ALLOWED_DOC_EXTENSIONS = ['.pdf', '.doc', '.docx'];
+const uploadDoc = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 20 * 1024 * 1024 },
+  fileFilter: (req, file, cb) => {
+    const ext = path.extname(file.originalname).toLowerCase();
+    if (ALLOWED_DOC_EXTENSIONS.includes(ext)) { cb(null, true); }
+    else { cb(new Error('Format non supporte. Utilisez PDF, DOC ou DOCX.')); }
+  }
+});
+
+router.post('/upload-document', authMiddleware, uploadDoc.single('document'), async (req, res) => {
+  if (!req.file) return res.status(400).json({ message: 'Aucun fichier recu.' });
+  try {
+    const ext = path.extname(req.file.originalname).toLowerCase();
+    const baseName = path.basename(req.file.originalname, ext).replace(/[^a-zA-Z0-9_-]/g, '_');
+    const uploadResult = await new Promise((resolve, reject) => {
+      cloudinary.uploader.upload_stream(
+        {
+          folder: 'expertise-senegal/documents',
+          resource_type: 'raw',
+          public_id: baseName + '_' + Date.now() + ext
+        },
+        (error, result) => { if (error) reject(error); else resolve(result); }
+      ).end(req.file.buffer);
+    });
+    res.json({ url: uploadResult.secure_url, filename: req.file.originalname, size: req.file.size });
+  } catch (error) {
+    console.error('Error uploading document:', error);
+    res.status(500).json({ message: 'Erreur upload: ' + error.message });
+  }
+});
 module.exports = router;

@@ -1,4 +1,4 @@
-const express = require('express');
+﻿const express = require('express');
 const router = express.Router();
 const db = require('../config/db');
 const authMiddleware = require('../middleware/auth');
@@ -91,7 +91,7 @@ router.post('/', authMiddleware, async (req, res) => {
 router.put('/:id', authMiddleware, async (req, res) => {
   const { id } = req.params;
   const { 
-    type, titre, description, contenu, image, 
+    type, titre, description, contenu, image, document_url,
     date_debut, date_fin, lieu, places_disponibles, prix, statut 
   } = req.body;
 

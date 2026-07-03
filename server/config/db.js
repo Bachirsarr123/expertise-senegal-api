@@ -1,4 +1,4 @@
-const mysql = require('mysql2/promise');
+﻿const mysql = require('mysql2/promise');
 const bcrypt = require('bcrypt');
 require('dotenv').config();
 
@@ -169,6 +169,11 @@ async function createTables() {
       await pool.query('INSERT IGNORE INTO parametres (cle, valeur) VALUES (?, ?)', [setting.cle, setting.valeur]);
     }
 
+    // Migration: ajouter document_url a publications si absente
+    try {
+      await pool.query(`ALTER TABLE publications ADD COLUMN document_url VARCHAR(500) DEFAULT NULL`);
+      console.log('Column document_url added to publications.');
+    } catch (e) { /* colonne deja existante */ }
     console.log('Database tables verified and seeded successfully.');
   } catch (error) {
     console.error('Error creating/seeding tables:', error.message);

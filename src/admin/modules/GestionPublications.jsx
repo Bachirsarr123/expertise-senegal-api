@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+﻿import { useState, useEffect } from 'react';
 import axiosInstance from '../utils/axiosInstance';
 import ImageUploadButton from '../components/ImageUploadButton';
 
@@ -40,6 +40,8 @@ const GestionPublications = ({ triggerToast, triggerConfirm }) => {
   const [formPlaces, setFormPlaces] = useState('');
   const [formPrix, setFormPrix] = useState('');
   const [formStatut, setFormStatut] = useState('brouillon');
+  const [formDocumentUrl, setFormDocumentUrl] = useState('');
+  const [uploadingDoc, setUploadingDoc] = useState(false);
 
   useEffect(() => {
     fetchPublications();
@@ -115,6 +117,7 @@ const GestionPublications = ({ triggerToast, triggerConfirm }) => {
     setFormPlaces('');
     setFormPrix('');
     setFormStatut('brouillon');
+    setFormDocumentUrl('');
     setView('create');
   };
 
@@ -125,6 +128,7 @@ const GestionPublications = ({ triggerToast, triggerConfirm }) => {
     setFormDescription(pub.description || '');
     setFormContenu(pub.contenu || '');
     setFormImage(pub.image || '');
+    setFormDocumentUrl(pub.document_url || '');
     
     // Format dates for inputs (YYYY-MM-DD)
     setFormDateDebut(pub.date_debut ? pub.date_debut.substring(0, 10) : '');
@@ -156,6 +160,7 @@ const GestionPublications = ({ triggerToast, triggerConfirm }) => {
       description: formDescription,
       contenu: formContenu,
       image: formImage,
+      document_url: formDocumentUrl,
       date_debut: formDateDebut || null,
       date_fin: formDateFin || null,
       lieu: formType === 'formation' ? formLieu : null,
@@ -304,6 +309,31 @@ const GestionPublications = ({ triggerToast, triggerConfirm }) => {
     return matchesType && matchesStatut;
   });
 
+
+  const handleDocumentUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const ext = file.name.split('.').pop().toLowerCase();
+    if (!['pdf', 'doc', 'docx'].includes(ext)) {
+      triggerToast('Format non supporté. Utilisez PDF, DOC ou DOCX.', 'error');
+      return;
+    }
+    setUploadingDoc(true);
+    try {
+      const formData = new FormData();
+      formData.append('document', file);
+      const res = await axiosInstance.post('/api/media/upload-document', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
+      setFormDocumentUrl(res.data.url);
+      triggerToast('Document téléversé avec succès.');
+    } catch (err) {
+      triggerToast('Erreur lors du téléversement.', 'error');
+    } finally {
+      setUploadingDoc(false);
+      e.target.value = '';
+    }
+  };
   if (loading) return <div className="loading-spinner">Chargement du module publications...</div>;
 
   return (
@@ -500,6 +530,34 @@ const GestionPublications = ({ triggerToast, triggerConfirm }) => {
                 <label>Image de couverture (URL)</label>
                 <input type="text" value={formImage} onChange={e => setFormImage(e.target.value)} placeholder="ex: /uploads/img.jpg ou URL externe" />
                 <p style={{ fontSize: '0.75rem', color: 'var(--texte-moyen)', marginTop: '4px' }}>Vous pouvez téléverser votre photo dans l'onglet "Médias", puis copier son URL ici.</p>
+              </div>
+
+              <div className="form-group">
+                <label>Document joint (PDF, Word)</label>
+                <p style={{ fontSize: '0.78rem', color: '#6B7280', marginBottom: '8px' }}>
+                  Ce document sera affiché et téléchargeable sur la page publique du séminaire.
+                </p>
+                <label style={{
+                  display: 'inline-flex', alignItems: 'center', gap: '8px',
+                  background: '#F3F4F6', border: '1.5px dashed #D1D5DB',
+                  borderRadius: '8px', padding: '10px 18px',
+                  cursor: uploadingDoc ? 'not-allowed' : 'pointer', fontSize: '0.9rem'
+                }}>
+                  <input type="file" accept=".pdf,.doc,.docx" onChange={handleDocumentUpload} style={{ display: 'none' }} disabled={uploadingDoc} />
+                  {uploadingDoc ? '⏳ Téléversement...' : '📎 Choisir un fichier PDF ou Word'}
+                </label>
+                {formDocumentUrl && (
+                  <div style={{ marginTop: '10px', padding: '10px 14px', background: '#EFF6FF', borderRadius: '8px', display: 'flex', alignItems: 'center', gap: '10px' }}>
+                    <span style={{ fontSize: '1.3rem' }}>{formDocumentUrl.match(/\.(docx?)$/i) ? '📄' : '📕'}</span>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <p style={{ margin: 0, fontWeight: 600, fontSize: '0.85rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        {decodeURIComponent(formDocumentUrl.split('/').pop().split('_').slice(0,-1).join('_') || formDocumentUrl.split('/').pop())}
+                      </p>
+                      <a href={formDocumentUrl} target="_blank" rel="noopener noreferrer" style={{ fontSize: '0.78rem', color: 'var(--or)' }}>Voir le document →</a>
+                    </div>
+                    <button type="button" onClick={() => setFormDocumentUrl('')} style={{ background: 'none', border: 'none', color: '#EF4444', cursor: 'pointer', fontSize: '1.1rem' }} title="Supprimer">✕</button>
+                  </div>
+                )}
               </div>
 
               <div className="form-group">
