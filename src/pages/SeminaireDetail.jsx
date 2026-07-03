@@ -244,10 +244,11 @@ const SeminaireDetail = () => {
                     {isPdf && (
                       <div className="pub-pdf-viewer">
                         <iframe
-                          src={pub.document_url}
-                          title="Document"
+                          src={'https://docs.google.com/viewer?url=' + encodeURIComponent(pub.document_url) + '&embedded=true'}
+                          title="Aperçu du document"
                           className="pdf-iframe"
                           frameBorder="0"
+                          allow="autoplay"
                         />
                       </div>
                     )}
