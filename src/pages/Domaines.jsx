@@ -5,6 +5,7 @@ import SEO from '../components/SEO';
 import './Domaines.css';
 
 const API = 'https://expertise-senegal-api-olf5.onrender.com';
+const apiClient = axios.create({ baseURL: API, timeout: 8000 });
 
 const Domaines = () => {
   const [heroBadge, setHeroBadge] = useState('● NOS DOMAINES — EXPERTISE SÉNÉGAL');

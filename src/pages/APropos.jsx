@@ -6,6 +6,7 @@ import ImageOptimisee from '../components/ImageOptimisee';
 import './APropos.css';
 
 const API = 'https://expertise-senegal-api-olf5.onrender.com';
+const apiClient = axios.create({ baseURL: API, timeout: 8000 });
 
 const APropos = () => {
   const [heroBadge, setHeroBadge] = useState('● À PROPOS — EXPERTISE SÉNÉGAL');

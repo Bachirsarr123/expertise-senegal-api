@@ -6,6 +6,7 @@ import ImageOptimisee from '../components/ImageOptimisee';
 import './Accueil.css';
 
 const API = 'https://expertise-senegal-api-olf5.onrender.com';
+const apiClient = axios.create({ baseURL: API, timeout: 8000 });
 
 const Accueil = () => {
   const [spotlight, setSpotlight] = useState(null);

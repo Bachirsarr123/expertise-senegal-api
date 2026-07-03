@@ -136,6 +136,8 @@ const GestionAccueil = ({ triggerToast, triggerConfirm }) => {
       setLoading(false);
     } catch (err) {
       triggerToast('Erreur lors du chargement.', 'error');
+    } finally {
+      setLoading(false);
     }
   };
 
