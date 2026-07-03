@@ -47,6 +47,7 @@ const GestionAPropos = ({ triggerToast, triggerConfirm }) => {
   const [adminCapital, setAdminCapital] = useState('');
   const [adminFiscalCentre, setAdminFiscalCentre] = useState('');
   const [adminActivity, setAdminActivity] = useState('');
+  const [foundingDate, setFoundingDate] = useState('');
 
   // CTA
   const [ctaTitle, setCtaTitle] = useState('');
@@ -105,10 +106,13 @@ const GestionAPropos = ({ triggerToast, triggerConfirm }) => {
       setAdminCapital(params.legal_capital || '');
       setAdminFiscalCentre(params.legal_fiscal_centre || '');
       setAdminActivity(params.legal_activity || '');
+      setFoundingDate(params.founding_date || '');
 
       setLoading(false);
     } catch (err) {
       triggerToast('Erreur lors du chargement.', 'error');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -334,6 +338,10 @@ const GestionAPropos = ({ triggerToast, triggerConfirm }) => {
               <input type="text" value={legalForm} onChange={e => setLegalForm(e.target.value)} placeholder="Ex: SARL" />
             </div>
           </div>
+          <div className="form-group mb-4">
+            <label>Date de création du cabinet</label>
+            <input type="text" value={foundingDate} onChange={e => setFoundingDate(e.target.value)} placeholder="22/11/2016" style={{ maxWidth: '220px' }} />
+          </div>
           <div className="admin-input-grid mb-4">
             <div className="form-group">
               <label>Téléphone</label>
@@ -376,6 +384,7 @@ const GestionAPropos = ({ triggerToast, triggerConfirm }) => {
             <button className="admin-btn admin-btn-secondary" onClick={() => saveParams('Données Administratives', {
               director_name: directorName, legal_form: legalForm,
               contact_phone: adminPhone, contact_email: adminEmail, contact_address: adminAddress,
+              founding_date: foundingDate,
               legal_rc: adminRC, legal_ninea: adminNinea, legal_capital: adminCapital,
               legal_fiscal_centre: adminFiscalCentre, legal_activity: adminActivity
             })}>💾 Enregistrer les données</button>

@@ -42,6 +42,7 @@ const APropos = () => {
   const [emailContact, setEmailContact] = useState('contact@expertisesenegal.com');
   const [rc, setRc] = useState('SN.DKR.2016.B.26579');
   const [ninea, setNinea] = useState('006146642 2V2');
+  const [foundingDate, setFoundingDate] = useState('22/11/2016');
 
   const [ctaTitle, setCtaTitle] = useState('Travaillons ensemble');
   const [ctaSubtitle, setCtaSubtitle] = useState('Contactez-nous pour discuter de vos besoins');
@@ -100,6 +101,7 @@ const APropos = () => {
       if (params.contact_email) setEmailContact(params.contact_email);
       if (params.legal_rc) setRc(params.legal_rc);
       if (params.legal_ninea) setNinea(params.legal_ninea);
+      if (params.founding_date) setFoundingDate(params.founding_date);
     } catch (err) {
       console.warn('Could not load dynamic content.');
     }
@@ -202,6 +204,11 @@ const APropos = () => {
                   <td className="admin-icon">🏢</td>
                   <td className="admin-label">Forme juridique</td>
                   <td className="admin-value">{legalForm}</td>
+                </tr>
+                <tr>
+                  <td className="admin-icon">📅</td>
+                  <td className="admin-label">Date de création</td>
+                  <td className="admin-value">{foundingDate}</td>
                 </tr>
                 <tr>
                   <td className="admin-icon">📍</td>
