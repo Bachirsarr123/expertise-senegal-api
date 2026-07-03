@@ -54,7 +54,7 @@ router.get('/:id', async (req, res) => {
 // POST /api/publications - Create new publication (Admin protected)
 router.post('/', authMiddleware, async (req, res) => {
   const { 
-    type, titre, description, contenu, image, 
+    type, titre, description, contenu, image, document_url,
     date_debut, date_fin, lieu, places_disponibles, prix, statut 
   } = req.body;
 
@@ -65,12 +65,13 @@ router.post('/', authMiddleware, async (req, res) => {
   const datePub = statut === 'publie' ? new Date() : null;
 
   try {
-    const [result] = await db.query(
+    const [[{ nextId }]] = await db.query('SELECT COALESCE(MAX(id), 0) + 1 AS nextId FROM publications');
+    await db.query(
       `INSERT INTO publications 
-       (type, titre, description, contenu, image, date_debut, date_fin, lieu, places_disponibles, prix, statut, date_publication) 
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+       (id, type, titre, description, contenu, image, document_url, date_debut, date_fin, lieu, places_disponibles, prix, statut, date_publication) 
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
-        type, titre, description || '', contenu || '', image || null, 
+        nextId, type, titre, description || '', contenu || '', image || null, document_url || null,
         date_debut || null, date_fin || null, lieu || null, 
         places_disponibles ? parseInt(places_disponibles) : null, 
         prix || null, statut || 'brouillon', datePub
@@ -79,7 +80,7 @@ router.post('/', authMiddleware, async (req, res) => {
 
     res.status(201).json({ 
       message: 'Publication créée avec succès.', 
-      id: result.insertId 
+      id: nextId 
     });
   } catch (error) {
     console.error('Error creating publication:', error);

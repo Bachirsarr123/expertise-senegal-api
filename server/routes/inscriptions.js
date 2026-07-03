@@ -1,4 +1,4 @@
-const express = require('express');
+﻿const express = require('express');
 const router = express.Router();
 const db = require('../config/db');
 const authMiddleware = require('../middleware/auth');
@@ -62,11 +62,12 @@ router.post('/', async (req, res) => {
     }
 
     // 2. Insert inscription
+    const [[{ nextInsId }]] = await db.query('SELECT COALESCE(MAX(id), 0) + 1 AS nextInsId FROM inscriptions');
     const [result] = await db.query(
       `INSERT INTO inscriptions 
-       (publication_id, nom, prenom, email, telephone, organisation, poste, message, statut) 
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'nouveau')`,
-      [publication_id, nom, prenom, email, telephone, organisation, poste || '', message || '']
+       (id, publication_id, nom, prenom, email, telephone, organisation, poste, message, statut) 
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'nouveau')`,
+      [nextInsId, publication_id, nom, prenom, email, telephone, organisation, poste || '', message || '']
     );
 
     // 3. Decrement places_disponibles if it's a formation
