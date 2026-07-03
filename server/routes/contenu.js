@@ -1,4 +1,4 @@
-const express = require('express');
+﻿const express = require('express');
 const router = express.Router();
 const db = require('../config/db');
 const authMiddleware = require('../middleware/auth');
@@ -15,7 +15,6 @@ const defaultContent = [
   { page: 'accueil', section: 'hero', cle: 'cta_primary_link', valeur: '/contact', type: 'texte' },
   { page: 'accueil', section: 'hero', cle: 'cta_secondary_text', valeur: 'Découvrir le Cabinet', type: 'texte' },
   { page: 'accueil', section: 'hero', cle: 'cta_secondary_link', valeur: '/a-propos', type: 'texte' },
-  { page: 'accueil', section: 'hero', cle: 'bg_image', valeur: '/src/assets/hero.png', type: 'image' },
   { page: 'accueil', section: 'hero', cle: 'bg_image', valeur: 'https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&q=80', type: 'image' },
   { page: 'accueil', section: 'hero', cle: 'active', valeur: 'true', type: 'boolean' },
 
@@ -119,11 +118,14 @@ async function checkAndSeedContent() {
     const [rows] = await db.query('SELECT COUNT(*) as count FROM contenu');
     if (rows[0].count === 0) {
       console.log('Seeding default page contents...');
+      const [[{ currentMax }]] = await db.query('SELECT COALESCE(MAX(id), 0) AS currentMax FROM contenu');
+      let nextId = currentMax + 1;
       for (const item of defaultContent) {
         await db.query(
-          'INSERT INTO contenu (page, section, cle, valeur, type) VALUES (?, ?, ?, ?, ?)',
-          [item.page, item.section, item.cle, item.valeur, item.type]
+          'INSERT IGNORE INTO contenu (id, page, section, cle, valeur, type) VALUES (?, ?, ?, ?, ?, ?)',
+          [nextId, item.page, item.section, item.cle, item.valeur, item.type]
         );
+        nextId++;
       }
       console.log('Page contents seeded.');
     }
@@ -170,12 +172,24 @@ router.post('/save', authMiddleware, async (req, res) => {
   try {
     for (const item of contents) {
       const { page, section, cle, valeur, type } = item;
-      await db.query(
-        `INSERT INTO contenu (page, section, cle, valeur, type) 
-         VALUES (?, ?, ?, ?, ?) 
-         ON DUPLICATE KEY UPDATE valeur = ?, type = ?`,
-        [page, section, cle, String(valeur), type || 'texte', String(valeur), type || 'texte']
+      const [existing] = await db.query(
+        'SELECT id FROM contenu WHERE page = ? AND section = ? AND cle = ?',
+        [page, section, cle]
       );
+      if (existing.length > 0) {
+        await db.query(
+          'UPDATE contenu SET valeur = ?, type = ? WHERE id = ?',
+          [String(valeur), type || 'texte', existing[0].id]
+        );
+      } else {
+        const [[{ nextId }]] = await db.query(
+          'SELECT COALESCE(MAX(id), 0) + 1 AS nextId FROM contenu'
+        );
+        await db.query(
+          'INSERT INTO contenu (id, page, section, cle, valeur, type) VALUES (?, ?, ?, ?, ?, ?)',
+          [nextId, page, section, cle, String(valeur), type || 'texte']
+        );
+      }
     }
     res.json({ message: 'Contenu mis à jour avec succès.' });
   } catch (error) {
@@ -205,10 +219,24 @@ router.put('/parametres', authMiddleware, async (req, res) => {
 
   try {
     for (const [cle, valeur] of Object.entries(settings)) {
-      await db.query(
-        'INSERT INTO parametres (cle, valeur) VALUES (?, ?) ON DUPLICATE KEY UPDATE valeur = ?',
-        [cle, String(valeur), String(valeur)]
+      const [existing] = await db.query(
+        'SELECT id FROM parametres WHERE cle = ?',
+        [cle]
       );
+      if (existing.length > 0) {
+        await db.query(
+          'UPDATE parametres SET valeur = ? WHERE id = ?',
+          [String(valeur), existing[0].id]
+        );
+      } else {
+        const [[{ nextId }]] = await db.query(
+          'SELECT COALESCE(MAX(id), 0) + 1 AS nextId FROM parametres'
+        );
+        await db.query(
+          'INSERT INTO parametres (id, cle, valeur) VALUES (?, ?, ?)',
+          [nextId, cle, String(valeur)]
+        );
+      }
     }
     res.json({ message: 'Paramètres mis à jour avec succès.' });
   } catch (error) {
@@ -218,3 +246,5 @@ router.put('/parametres', authMiddleware, async (req, res) => {
 });
 
 module.exports = router;
+
+
