@@ -1,358 +1,403 @@
-import { useState, useEffect } from 'react';
+﻿import { useState, useEffect } from 'react';
 import axiosInstance from '../utils/axiosInstance';
+
+const SITE = 'https://www.expertisesenegal.com';
+
+const SectionHint = ({ label }) => (
+  <p style={{ fontSize: '0.8rem', color: '#6B7280', margin: '0 0 16px 0', display: 'flex', alignItems: 'center', gap: '6px' }}>
+    <span>📍</span> <span>Affiché sur le site : <strong>{label}</strong></span>
+    <a href={`${SITE}/domaines`} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--or)', marginLeft: '8px' }}>Voir →</a>
+  </p>
+);
 
 const GestionDomaines = ({ triggerToast, triggerConfirm }) => {
   const [loading, setLoading] = useState(true);
-  const [activeDomainTab, setActiveDomainTab] = useState('domaine1');
+  const [activeTab, setActiveTab] = useState('hero');
 
-  // Hero section state
   const [heroBadge, setHeroBadge] = useState('');
   const [heroTitleWhite, setHeroTitleWhite] = useState('');
   const [heroTitleGold, setHeroTitleGold] = useState('');
   const [heroSubtitle, setHeroSubtitle] = useState('');
 
-  // Domains State
-  const [domainData, setDomainData] = useState({
-    domaine1: { title: '', intro: '', prestations: [], references: [], active: true },
-    domaine2: { title: '', intro: '', prestations: [], references: [], active: true },
-    domaine3: { title: '', intro: '', prestations: [], references: [], active: true },
-    domaine4: { title: '', intro: '', prestations: [], themes: [], active: true }
+  const [domaines, setDomaines] = useState({
+    domaine1: { label: '', title: '', intro: '', prestations: [], references: [], active: true },
+    domaine2: { label: '', title: '', intro: '', prestations: [], references: [], active: true },
+    domaine3: { label: '', title: '', intro: '', prestations: [], references: [], active: true },
+    domaine4: { label: '', title: '', intro: '', prestations: [], references: [], formats: [], themes: [], active: true }
   });
 
-  // Adding item states
-  const [newPrestation, setNewPrestation] = useState('');
-  const [newReference, setNewReference] = useState('');
+  const [newItem, setNewItem] = useState('');
+  const [newRef, setNewRef] = useState('');
   const [newTheme, setNewTheme] = useState('');
 
-  useEffect(() => {
-    fetchContent();
-  }, []);
+  const [ctaTitle, setCtaTitle] = useState('');
+  const [ctaSubtitle, setCtaSubtitle] = useState('');
+  const [ctaBtnText, setCtaBtnText] = useState('');
+  const [ctaBtnLink, setCtaBtnLink] = useState('');
+
+  useEffect(() => { fetchContent(); }, []);
+
+  const parseJson = (str, fallback) => { try { return JSON.parse(str); } catch { return fallback; } };
 
   const fetchContent = async () => {
     try {
-      const response = await axiosInstance.get('/api/content/all');
-      const data = response.data.domaines || {};
+      const { data } = await axiosInstance.get('/api/content/all');
+      const d = data.domaines || {};
 
-      // Hero
-      if (data.hero) {
-        setHeroBadge(data.hero.badge || '');
-        setHeroTitleWhite(data.hero.title_white || '');
-        setHeroTitleGold(data.hero.title_gold || '');
-        setHeroSubtitle(data.hero.subtitle || '');
+      if (d.hero) {
+        setHeroBadge(d.hero.badge || '');
+        setHeroTitleWhite(d.hero.title_white || '');
+        setHeroTitleGold(d.hero.title_gold || '');
+        setHeroSubtitle(d.hero.subtitle || '');
       }
 
-      // Format domains
-      const formatted = { ...domainData };
-      
-      ['domaine1', 'domaine2', 'domaine3', 'domaine4'].forEach(domKey => {
-        if (data[domKey]) {
-          formatted[domKey] = {
-            title: data[domKey].title || '',
-            intro: data[domKey].intro || '',
-            active: data[domKey].active !== false && data[domKey].active !== 'false',
-            prestations: JSON.parse(data[domKey].prestations || '[]'),
-            references: JSON.parse(data[domKey].references || '[]'),
-            themes: JSON.parse(data[domKey].themes || '[]')
+      if (d.cta) {
+        setCtaTitle(d.cta.title || '');
+        setCtaSubtitle(d.cta.subtitle || '');
+        setCtaBtnText(d.cta.btn_text || '');
+        setCtaBtnLink(d.cta.btn_link || '');
+      }
+
+      const updated = { ...domaines };
+      ['domaine1', 'domaine2', 'domaine3', 'domaine4'].forEach(key => {
+        if (d[key]) {
+          updated[key] = {
+            label: d[key].label || '',
+            title: d[key].title || '',
+            intro: d[key].intro || '',
+            active: d[key].active !== false,
+            prestations: parseJson(d[key].prestations, []),
+            references: parseJson(d[key].references, []),
+            formats: parseJson(d[key].formats, []),
+            themes: parseJson(d[key].themes, [])
           };
         }
       });
-
-      setDomainData(formatted);
+      setDomaines(updated);
       setLoading(false);
-    } catch (error) {
-      console.error('Error loading domains:', error);
-      triggerToast('Erreur lors du chargement des domaines.', 'error');
+    } catch (err) {
+      triggerToast('Erreur lors du chargement.', 'error');
     }
   };
 
-  const handleSaveDomain = async (domKey) => {
-    triggerConfirm(`Enregistrer les modifications pour le ${domKey.replace('domaine', 'Domaine ')} ?`, async () => {
+  const save = async (label, contents) => {
+    triggerConfirm(`Enregistrer ${label} ?`, async () => {
       try {
-        const dom = domainData[domKey];
-        const contents = [
-          { page: 'domaines', section: domKey, cle: 'title', valeur: dom.title, type: 'texte' },
-          { page: 'domaines', section: domKey, cle: 'intro', valeur: dom.intro, type: 'texte' },
-          { page: 'domaines', section: domKey, cle: 'active', valeur: String(dom.active), type: 'boolean' },
-          { page: 'domaines', section: domKey, cle: 'prestations', valeur: JSON.stringify(dom.prestations), type: 'texte' }
-        ];
-
-        if (domKey === 'domaine4') {
-          contents.push({ page: 'domaines', section: domKey, cle: 'themes', valeur: JSON.stringify(dom.themes), type: 'texte' });
-        } else {
-          contents.push({ page: 'domaines', section: domKey, cle: 'references', valeur: JSON.stringify(dom.references), type: 'texte' });
-        }
-
         await axiosInstance.post('/api/content/save', { contents });
-        triggerToast('Sauvegarde effectuée avec succès.');
-      } catch (err) {
-        console.error('Error saving domain:', err);
+        triggerToast(`${label} mis à jour.`);
+      } catch {
         triggerToast('Erreur lors de la sauvegarde.', 'error');
       }
     });
   };
 
-  const handleSaveHero = async () => {
-    triggerConfirm('Enregistrer le Héro de la page Domaines ?', async () => {
-      try {
-        const contents = [
-          { page: 'domaines', section: 'hero', cle: 'badge', valeur: heroBadge, type: 'texte' },
-          { page: 'domaines', section: 'hero', cle: 'title_white', valeur: heroTitleWhite, type: 'texte' },
-          { page: 'domaines', section: 'hero', cle: 'title_gold', valeur: heroTitleGold, type: 'texte' },
-          { page: 'domaines', section: 'hero', cle: 'subtitle', valeur: heroSubtitle, type: 'texte' }
-        ];
-        await axiosInstance.post('/api/content/save', { contents });
-        triggerToast('Héro de la page Domaines mis à jour.');
-      } catch (err) {
-        console.error('Error saving domain hero:', err);
-        triggerToast('Erreur lors de la sauvegarde.', 'error');
-      }
-    });
+  const update = (key, field, val) => {
+    setDomaines(prev => ({ ...prev, [key]: { ...prev[key], [field]: val } }));
   };
 
-  // Helper to add list items
-  const addPrestation = (domKey) => {
-    if (!newPrestation.trim()) return;
-    const updated = { ...domainData };
-    updated[domKey].prestations.push(newPrestation.trim());
-    setDomainData(updated);
-    setNewPrestation('');
+  const addToList = (key, field, val) => {
+    if (!val.trim()) return;
+    setDomaines(prev => ({ ...prev, [key]: { ...prev[key], [field]: [...prev[key][field], val.trim()] } }));
   };
 
-  const removePrestation = (domKey, idx) => {
-    const updated = { ...domainData };
-    updated[domKey].prestations = updated[domKey].prestations.filter((_, i) => i !== idx);
-    setDomainData(updated);
+  const removeFromList = (key, field, idx) => {
+    setDomaines(prev => ({ ...prev, [key]: { ...prev[key], [field]: prev[key][field].filter((_, i) => i !== idx) } }));
   };
 
-  const addReference = (domKey) => {
-    if (!newReference.trim()) return;
-    const updated = { ...domainData };
-    updated[domKey].references.push(newReference.trim());
-    setDomainData(updated);
-    setNewReference('');
+  const updateFormatCard = (idx, field, val) => {
+    const updated = [...domaines.domaine4.formats];
+    updated[idx] = { ...updated[idx], [field]: val };
+    update('domaine4', 'formats', updated);
   };
 
-  const removeReference = (domKey, idx) => {
-    const updated = { ...domainData };
-    updated[domKey].references = updated[domKey].references.filter((_, i) => i !== idx);
-    setDomainData(updated);
+  const saveDomaine = (key) => {
+    const dom = domaines[key];
+    const label = `Domaine ${key.replace('domaine', '')}`;
+    const contents = [
+      { page: 'domaines', section: key, cle: 'label', valeur: dom.label, type: 'texte' },
+      { page: 'domaines', section: key, cle: 'title', valeur: dom.title, type: 'texte' },
+      { page: 'domaines', section: key, cle: 'intro', valeur: dom.intro, type: 'texte' },
+      { page: 'domaines', section: key, cle: 'active', valeur: String(dom.active), type: 'boolean' },
+      { page: 'domaines', section: key, cle: 'prestations', valeur: JSON.stringify(dom.prestations), type: 'texte' },
+      { page: 'domaines', section: key, cle: 'references', valeur: JSON.stringify(dom.references), type: 'texte' }
+    ];
+    if (key === 'domaine4') {
+      contents.push({ page: 'domaines', section: key, cle: 'themes', valeur: JSON.stringify(dom.themes), type: 'texte' });
+      contents.push({ page: 'domaines', section: key, cle: 'formats', valeur: JSON.stringify(dom.formats), type: 'texte' });
+    }
+    save(label, contents);
   };
 
-  const addTheme = () => {
-    if (!newTheme.trim()) return;
-    const updated = { ...domainData };
-    updated.domaine4.themes.push(newTheme.trim());
-    setDomainData(updated);
-    setNewTheme('');
-  };
+  const tabs = [
+    { id: 'hero', label: 'En-tête' },
+    { id: 'domaine1', label: 'Domaine 1' },
+    { id: 'domaine2', label: 'Domaine 2' },
+    { id: 'domaine3', label: 'Domaine 3' },
+    { id: 'domaine4', label: 'Domaine 4' },
+    { id: 'cta', label: 'CTA' }
+  ];
 
-  const removeTheme = (idx) => {
-    const updated = { ...domainData };
-    updated.domaine4.themes = updated.domaine4.themes.filter((_, i) => i !== idx);
-    setDomainData(updated);
-  };
-
-  const updateDomainField = (domKey, field, val) => {
-    const updated = { ...domainData };
-    updated[domKey][field] = val;
-    setDomainData(updated);
-  };
-
-  if (loading) return <div className="loading-spinner">Chargement des domaines d'activité...</div>;
+  if (loading) return <div className="loading-spinner">Chargement…</div>;
 
   return (
     <div className="gestion-domaines-module">
-      {/* Hero Section */}
-      <div className="admin-card">
-        <h2 className="admin-card-title">En-tête (Hero) de la page Domaines</h2>
-        <div className="admin-form">
+
+      {/* Navigation onglets */}
+      <div className="admin-card" style={{ padding: '12px 20px' }}>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+          {tabs.map(tab => (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className={`admin-btn ${activeTab === tab.id ? 'admin-btn-primary' : 'admin-btn-outline'}`}
+              style={{ padding: '8px 16px', fontSize: '0.85rem' }}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* EN-TÊTE / HERO */}
+      {activeTab === 'hero' && (
+        <div className="admin-card">
+          <h2 className="admin-card-title">Bannière Héro</h2>
+          <SectionHint label="Page Domaines → Grande bannière en haut de page" />
           <div className="form-group mb-4">
-            <label>Badge Héro</label>
+            <label>Badge</label>
             <input type="text" value={heroBadge} onChange={e => setHeroBadge(e.target.value)} />
+          </div>
+          <div className="admin-input-grid mb-4">
+            <div className="form-group">
+              <label>Titre (partie blanche)</label>
+              <input type="text" value={heroTitleWhite} onChange={e => setHeroTitleWhite(e.target.value)} />
+            </div>
+            <div className="form-group">
+              <label>Titre (partie dorée)</label>
+              <input type="text" value={heroTitleGold} onChange={e => setHeroTitleGold(e.target.value)} />
+            </div>
+          </div>
+          <div className="form-group mb-4">
+            <label>Sous-titre</label>
+            <textarea rows="2" value={heroSubtitle} onChange={e => setHeroSubtitle(e.target.value)}></textarea>
+          </div>
+          <div className="form-actions-bar">
+            <button className="admin-btn admin-btn-secondary" onClick={() => save('En-tête', [
+              { page: 'domaines', section: 'hero', cle: 'badge', valeur: heroBadge, type: 'texte' },
+              { page: 'domaines', section: 'hero', cle: 'title_white', valeur: heroTitleWhite, type: 'texte' },
+              { page: 'domaines', section: 'hero', cle: 'title_gold', valeur: heroTitleGold, type: 'texte' },
+              { page: 'domaines', section: 'hero', cle: 'subtitle', valeur: heroSubtitle, type: 'texte' }
+            ])}>💾 Enregistrer En-tête</button>
+          </div>
+        </div>
+      )}
+
+      {/* DOMAINES 1-3 */}
+      {['domaine1', 'domaine2', 'domaine3'].map(key => activeTab === key && (
+        <div className="admin-card" key={key}>
+          <h2 className="admin-card-title">Domaine {key.replace('domaine', '')}</h2>
+          <SectionHint label={`Page Domaines → Section Domaine ${key.replace('domaine', '')}`} />
+
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+            <span style={{ fontSize: '0.85rem', color: '#6B7280' }}>Statut :</span>
+            <div className="toggle-switch-container" onClick={() => update(key, 'active', !domaines[key].active)}>
+              <div className={`toggle-switch ${domaines[key].active ? 'active' : ''}`}>
+                <div className="toggle-switch-handle"></div>
+              </div>
+              <span className="toggle-switch-label">{domaines[key].active ? 'Affiché' : 'Masqué'}</span>
+            </div>
           </div>
 
           <div className="admin-input-grid mb-4">
             <div className="form-group">
-              <label>Titre Héro (Blanc)</label>
-              <input type="text" value={heroTitleWhite} onChange={e => setHeroTitleWhite(e.target.value)} />
+              <label>Libellé (petit texte doré)</label>
+              <input type="text" value={domaines[key].label} onChange={e => update(key, 'label', e.target.value)} placeholder="— DOMAINE 1 —" />
             </div>
             <div className="form-group">
-              <label>Titre Héro (Doré)</label>
-              <input type="text" value={heroTitleGold} onChange={e => setHeroTitleGold(e.target.value)} />
+              <label>Titre</label>
+              <input type="text" value={domaines[key].title} onChange={e => update(key, 'title', e.target.value)} />
+            </div>
+          </div>
+          <div className="form-group mb-4">
+            <label>Introduction</label>
+            <textarea rows="3" value={domaines[key].intro} onChange={e => update(key, 'intro', e.target.value)}></textarea>
+          </div>
+
+          <div className="form-group mb-4">
+            <label>Prestations / Services</label>
+            <ul className="draggable-list mb-2">
+              {domaines[key].prestations.map((p, i) => (
+                <li key={i} className="draggable-item" style={{ cursor: 'default' }}>
+                  <div className="draggable-item-content">{p}</div>
+                  <button className="admin-btn admin-btn-danger" style={{ padding: '4px 8px', fontSize: '0.8rem' }} onClick={() => removeFromList(key, 'prestations', i)}>✕</button>
+                </li>
+              ))}
+            </ul>
+            <div className="admin-input-grid" style={{ gridTemplateColumns: '1fr auto', alignItems: 'end' }}>
+              <input type="text" value={newItem} onChange={e => setNewItem(e.target.value)} placeholder="Ajouter une prestation…" />
+              <button className="admin-btn admin-btn-primary" style={{ marginLeft: '8px' }} onClick={() => { addToList(key, 'prestations', newItem); setNewItem(''); }}>＋</button>
             </div>
           </div>
 
           <div className="form-group mb-4">
-            <label>Sous-titre Héro</label>
-            <textarea rows="2" value={heroSubtitle} onChange={e => setHeroSubtitle(e.target.value)}></textarea>
+            <label>Références clients</label>
+            <ul className="draggable-list mb-2">
+              {domaines[key].references.map((r, i) => (
+                <li key={i} className="draggable-item" style={{ cursor: 'default' }}>
+                  <div className="draggable-item-content">{r}</div>
+                  <button className="admin-btn admin-btn-danger" style={{ padding: '4px 8px', fontSize: '0.8rem' }} onClick={() => removeFromList(key, 'references', i)}>✕</button>
+                </li>
+              ))}
+            </ul>
+            <div className="admin-input-grid" style={{ gridTemplateColumns: '1fr auto', alignItems: 'end' }}>
+              <input type="text" value={newRef} onChange={e => setNewRef(e.target.value)} placeholder="Ex: PAPSEN — Audit de conformité…" />
+              <button className="admin-btn admin-btn-primary" style={{ marginLeft: '8px' }} onClick={() => { addToList(key, 'references', newRef); setNewRef(''); }}>＋</button>
+            </div>
           </div>
 
           <div className="form-actions-bar">
-            <button className="admin-btn admin-btn-secondary" onClick={handleSaveHero}>
-              💾 Enregistrer En-tête
+            <button className="admin-btn admin-btn-secondary" onClick={() => saveDomaine(key)}>
+              💾 Enregistrer Domaine {key.replace('domaine', '')}
             </button>
           </div>
         </div>
-      </div>
+      ))}
 
-      {/* Domain Modules Selector Tabs */}
-      <div className="admin-card">
-        <h2 className="admin-card-title">Gestion des Domaines d'Activité</h2>
-        
-        <div className="admin-input-grid mb-4" style={{ gridTemplateColumns: 'repeat(4, 1fr)', gap: '10px' }}>
-          {['domaine1', 'domaine2', 'domaine3', 'domaine4'].map(domKey => (
-            <button 
-              key={domKey}
-              onClick={() => setActiveDomainTab(domKey)}
-              className={`admin-btn ${activeDomainTab === domKey ? 'admin-btn-primary' : 'admin-btn-outline'}`}
-              style={{ padding: '12px 6px', fontSize: '0.85rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
-            >
-              {domKey.replace('domaine', 'Domaine ')}
-            </button>
-          ))}
-        </div>
+      {/* DOMAINE 4 */}
+      {activeTab === 'domaine4' && (
+        <div className="admin-card">
+          <h2 className="admin-card-title">Domaine 4 — Formation</h2>
+          <SectionHint label="Page Domaines → Section Formation avec formats et thèmes" />
 
-        {/* Selected Domain Fields */}
-        {['domaine1', 'domaine2', 'domaine3', 'domaine4'].map(domKey => {
-          if (activeDomainTab !== domKey) return null;
-          const dom = domainData[domKey];
+          <div className="admin-input-grid mb-4">
+            <div className="form-group">
+              <label>Libellé (petit texte doré)</label>
+              <input type="text" value={domaines.domaine4.label} onChange={e => update('domaine4', 'label', e.target.value)} />
+            </div>
+            <div className="form-group">
+              <label>Titre</label>
+              <input type="text" value={domaines.domaine4.title} onChange={e => update('domaine4', 'title', e.target.value)} />
+            </div>
+          </div>
+          <div className="form-group mb-4">
+            <label>Introduction</label>
+            <textarea rows="3" value={domaines.domaine4.intro} onChange={e => update('domaine4', 'intro', e.target.value)}></textarea>
+          </div>
 
-          return (
-            <div key={domKey} className="domain-tab-detail-content">
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-                <h3>Paramètres du {domKey.replace('domaine', 'Domaine ')}</h3>
-                <div className="toggle-switch-container" onClick={() => updateDomainField(domKey, 'active', !dom.active)}>
-                  <div className={`toggle-switch ${dom.active ? 'active' : ''}`}>
-                    <div className="toggle-switch-handle"></div>
-                  </div>
-                  <span className="toggle-switch-label">{dom.active ? 'Actif' : 'Désactivé'}</span>
+          <div className="form-group mb-4">
+            <label>Prestations / Services</label>
+            <ul className="draggable-list mb-2">
+              {domaines.domaine4.prestations.map((p, i) => (
+                <li key={i} className="draggable-item" style={{ cursor: 'default' }}>
+                  <div className="draggable-item-content">{p}</div>
+                  <button className="admin-btn admin-btn-danger" style={{ padding: '4px 8px', fontSize: '0.8rem' }} onClick={() => removeFromList('domaine4', 'prestations', i)}>✕</button>
+                </li>
+              ))}
+            </ul>
+            <div className="admin-input-grid" style={{ gridTemplateColumns: '1fr auto', alignItems: 'end' }}>
+              <input type="text" value={newItem} onChange={e => setNewItem(e.target.value)} placeholder="Ajouter une prestation…" />
+              <button className="admin-btn admin-btn-primary" style={{ marginLeft: '8px' }} onClick={() => { addToList('domaine4', 'prestations', newItem); setNewItem(''); }}>＋</button>
+            </div>
+          </div>
+
+          <div className="golden-divider" style={{ margin: '20px 0' }}></div>
+          <h3 style={{ marginBottom: '12px' }}>Formats de formation</h3>
+          <p style={{ fontSize: '0.85rem', color: '#6B7280', marginBottom: '12px' }}>Affiché sur le site : Page Domaines → Cartes "Intra-organisation", "Inter-organisations", "Sur site"</p>
+          {domaines.domaine4.formats.map((f, i) => (
+            <div key={i} style={{ border: '1px solid #E5E7EB', borderRadius: '8px', padding: '14px', marginBottom: '10px' }}>
+              <div className="admin-input-grid mb-2" style={{ gridTemplateColumns: '80px 1fr' }}>
+                <div className="form-group">
+                  <label>Icône</label>
+                  <input type="text" value={f.icon} onChange={e => updateFormatCard(i, 'icon', e.target.value)} />
+                </div>
+                <div className="form-group">
+                  <label>Titre</label>
+                  <input type="text" value={f.title} onChange={e => updateFormatCard(i, 'title', e.target.value)} />
                 </div>
               </div>
-
-              <div className="form-group mb-4">
-                <label>Titre officiel du domaine</label>
-                <input 
-                  type="text" 
-                  value={dom.title} 
-                  onChange={e => updateDomainField(domKey, 'title', e.target.value)} 
-                />
-              </div>
-
-              <div className="form-group mb-4">
-                <label>Texte d'introduction</label>
-                <textarea 
-                  rows="3" 
-                  value={dom.intro} 
-                  onChange={e => updateDomainField(domKey, 'intro', e.target.value)}
-                ></textarea>
-              </div>
-
-              <div className="golden-divider" style={{ margin: '30px 0' }}></div>
-
-              {/* Prestations */}
-              <div className="form-group mb-4">
-                <label>Prestations / Services inclus</label>
-                <ul className="draggable-list mb-3">
-                  {dom.prestations.map((prest, idx) => (
-                    <li key={idx} className="draggable-item" style={{ cursor: 'default' }}>
-                      <div className="draggable-item-content">{prest}</div>
-                      <button className="admin-btn admin-btn-danger" style={{ padding: '4px 8px' }} onClick={() => removePrestation(domKey, idx)}>
-                        Supprimer
-                      </button>
-                    </li>
-                  ))}
-                </ul>
-
-                <div className="admin-input-grid" style={{ gridTemplateColumns: '1fr auto', alignItems: 'end' }}>
-                  <div className="form-group">
-                    <label>Ajouter une prestation</label>
-                    <input 
-                      type="text" 
-                      value={newPrestation} 
-                      onChange={e => setNewPrestation(e.target.value)} 
-                      placeholder="Ex: Réalisation d'études de faisabilité..." 
-                    />
-                  </div>
-                  <button className="admin-btn admin-btn-primary" onClick={() => addPrestation(domKey)}>
-                    ＋ Ajouter
-                  </button>
-                </div>
-              </div>
-
-              <div className="golden-divider" style={{ margin: '30px 0' }}></div>
-
-              {/* References vs Themes */}
-              {domKey === 'domaine4' ? (
-                // Pedagogic Pole Themes
-                <div className="form-group mb-4">
-                  <label>Thématiques de formation (Badges)</label>
-                  <div className="draggable-list mb-3">
-                    {dom.themes.map((theme, idx) => (
-                      <div key={idx} className="draggable-item" style={{ cursor: 'default' }}>
-                        <div className="draggable-item-content"><strong>{theme}</strong></div>
-                        <button className="admin-btn admin-btn-danger" style={{ padding: '4px 8px' }} onClick={() => removeTheme(idx)}>
-                          Supprimer
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-
-                  <div className="admin-input-grid" style={{ gridTemplateColumns: '1fr auto', alignItems: 'end' }}>
-                    <div className="form-group">
-                      <label>Ajouter une thématique</label>
-                      <input 
-                        type="text" 
-                        value={newTheme} 
-                        onChange={e => setNewTheme(e.target.value)} 
-                        placeholder="Ex: Soft Skills..." 
-                      />
-                    </div>
-                    <button className="admin-btn admin-btn-primary" onClick={addTheme}>
-                      ＋ Ajouter
-                    </button>
-                  </div>
-                </div>
-              ) : (
-                // References
-                <div className="form-group mb-4">
-                  <label>Références clients associées</label>
-                  <ul className="draggable-list mb-3">
-                    {dom.references.map((ref, idx) => (
-                      <li key={idx} className="draggable-item" style={{ cursor: 'default' }}>
-                        <div className="draggable-item-content">{ref}</div>
-                        <button className="admin-btn admin-btn-danger" style={{ padding: '4px 8px' }} onClick={() => removeReference(domKey, idx)}>
-                          Supprimer
-                        </button>
-                      </li>
-                    ))}
-                  </ul>
-
-                  <div className="admin-input-grid" style={{ gridTemplateColumns: '1fr auto', alignItems: 'end' }}>
-                    <div className="form-group">
-                      <label>Ajouter une référence client</label>
-                      <input 
-                        type="text" 
-                        value={newReference} 
-                        onChange={e => setNewReference(e.target.value)} 
-                        placeholder="Ex: Étude d'impact environnemental (Client: ONG...)" 
-                      />
-                    </div>
-                    <button className="admin-btn admin-btn-primary" onClick={() => addReference(domKey)}>
-                      ＋ Ajouter
-                    </button>
-                  </div>
-                </div>
-              )}
-
-              <div className="form-actions-bar">
-                <button className="admin-btn admin-btn-secondary" onClick={() => handleSaveDomain(domKey)}>
-                  💾 Enregistrer {domKey.replace('domaine', 'Domaine ')}
-                </button>
+              <div className="form-group">
+                <label>Description</label>
+                <textarea rows="2" value={f.desc} onChange={e => updateFormatCard(i, 'desc', e.target.value)}></textarea>
               </div>
             </div>
-          );
-        })}
-      </div>
+          ))}
+
+          <div className="golden-divider" style={{ margin: '20px 0' }}></div>
+          <h3 style={{ marginBottom: '12px' }}>Thèmes de formation (badges)</h3>
+          <p style={{ fontSize: '0.85rem', color: '#6B7280', marginBottom: '12px' }}>Affiché sur le site : Page Domaines → Badges de thèmes de formation</p>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginBottom: '12px' }}>
+            {domaines.domaine4.themes.map((t, i) => (
+              <span key={i} style={{ background: '#F3F4F6', border: '1px solid #E5E7EB', borderRadius: '20px', padding: '4px 12px', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.85rem' }}>
+                {t}
+                <button style={{ background: 'none', border: 'none', color: '#EF4444', cursor: 'pointer', lineHeight: 1 }} onClick={() => removeFromList('domaine4', 'themes', i)}>✕</button>
+              </span>
+            ))}
+          </div>
+          <div className="admin-input-grid" style={{ gridTemplateColumns: '1fr auto', alignItems: 'end' }}>
+            <input type="text" value={newTheme} onChange={e => setNewTheme(e.target.value)} placeholder="Ex: Soft Skills…" onKeyDown={e => { if (e.key === 'Enter') { addToList('domaine4', 'themes', newTheme); setNewTheme(''); } }} />
+            <button className="admin-btn admin-btn-primary" style={{ marginLeft: '8px' }} onClick={() => { addToList('domaine4', 'themes', newTheme); setNewTheme(''); }}>＋</button>
+          </div>
+
+          <div className="form-group mt-4 mb-4">
+            <label>Références clients</label>
+            <ul className="draggable-list mb-2">
+              {domaines.domaine4.references.map((r, i) => (
+                <li key={i} className="draggable-item" style={{ cursor: 'default' }}>
+                  <div className="draggable-item-content">{r}</div>
+                  <button className="admin-btn admin-btn-danger" style={{ padding: '4px 8px', fontSize: '0.8rem' }} onClick={() => removeFromList('domaine4', 'references', i)}>✕</button>
+                </li>
+              ))}
+            </ul>
+            <div className="admin-input-grid" style={{ gridTemplateColumns: '1fr auto', alignItems: 'end' }}>
+              <input type="text" value={newRef} onChange={e => setNewRef(e.target.value)} placeholder="Ex: DP World — Formation Informatique…" />
+              <button className="admin-btn admin-btn-primary" style={{ marginLeft: '8px' }} onClick={() => { addToList('domaine4', 'references', newRef); setNewRef(''); }}>＋</button>
+            </div>
+          </div>
+
+          <div className="form-actions-bar">
+            <button className="admin-btn admin-btn-secondary" onClick={() => saveDomaine('domaine4')}>
+              💾 Enregistrer Domaine 4
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* CTA */}
+      {activeTab === 'cta' && (
+        <div className="admin-card">
+          <h2 className="admin-card-title">Bannière d'Appel à l'Action (CTA)</h2>
+          <SectionHint label="Page Domaines → Bloc de fin de page avec bouton de contact" />
+          <div className="admin-form">
+            <div className="form-group mb-4">
+              <label>Titre</label>
+              <input type="text" value={ctaTitle} onChange={e => setCtaTitle(e.target.value)} />
+            </div>
+            <div className="form-group mb-4">
+              <label>Sous-titre</label>
+              <input type="text" value={ctaSubtitle} onChange={e => setCtaSubtitle(e.target.value)} />
+            </div>
+            <div className="admin-input-grid mb-4">
+              <div className="form-group">
+                <label>Texte du bouton</label>
+                <input type="text" value={ctaBtnText} onChange={e => setCtaBtnText(e.target.value)} />
+              </div>
+              <div className="form-group">
+                <label>Lien du bouton</label>
+                <input type="text" value={ctaBtnLink} onChange={e => setCtaBtnLink(e.target.value)} />
+              </div>
+            </div>
+            <div className="form-actions-bar">
+              <button className="admin-btn admin-btn-secondary" onClick={() => save('Bannière CTA', [
+                { page: 'domaines', section: 'cta', cle: 'title', valeur: ctaTitle, type: 'texte' },
+                { page: 'domaines', section: 'cta', cle: 'subtitle', valeur: ctaSubtitle, type: 'texte' },
+                { page: 'domaines', section: 'cta', cle: 'btn_text', valeur: ctaBtnText, type: 'texte' },
+                { page: 'domaines', section: 'cta', cle: 'btn_link', valeur: ctaBtnLink, type: 'texte' }
+              ])}>💾 Enregistrer CTA</button>
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 };
