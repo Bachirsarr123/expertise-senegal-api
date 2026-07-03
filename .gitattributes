@@ -1,0 +1,2 @@
+# Force LF for server config files
+.htaccess text eol=lf
