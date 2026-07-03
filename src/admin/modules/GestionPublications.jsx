@@ -439,6 +439,16 @@ const GestionPublications = ({ triggerToast, triggerConfirm }) => {
                             >
                               ✏️ Modifier
                             </button>
+                            <a
+                              href={'/seminaires/' + pub.id}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="admin-btn admin-btn-outline"
+                              style={{ padding: '6px 10px', fontSize: '0.8rem', textDecoration: 'none', display: 'inline-block' }}
+                              title="Voir la page publique"
+                            >
+                              🔗 Voir
+                            </a>
                             <button 
                               className="admin-btn admin-btn-outline" 
                               style={{ 

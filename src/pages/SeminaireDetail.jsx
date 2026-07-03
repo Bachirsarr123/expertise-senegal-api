@@ -223,39 +223,39 @@ const SeminaireDetail = () => {
             </div>
 
             {/* Document joint */}
-            {pub.document_url && (() => {
-              const isPdf = pub.document_url.match(/\.pdf(\?|$)/i) || pub.document_url.includes('.pdf');
-              const isWord = pub.document_url.match(/\.(docx?)(\?|$)/i);
-              const fileName = decodeURIComponent(pub.document_url.split('/').pop().split('?')[0]);
-              return (
-                <div className="pub-document-section">
-                  <h2 className="content-h2">📎 Document joint</h2>
-                  <div className="pub-document-card">
-                    <div className="pub-document-header">
-                      <span className="doc-icon">{isWord ? '📄' : '📕'}</span>
-                      <div className="doc-info">
-                        <p className="doc-name">{fileName}</p>
-                        <p className="doc-type">{isWord ? 'Document Word' : 'Document PDF'}</p>
-                      </div>
-                      <a href={pub.document_url} download target="_blank" rel="noopener noreferrer" className="btn btn-download">
-                        ⬇️ Télécharger
-                      </a>
+            {pub.document_url && (
+              <div className="pub-document-section">
+                <h2 className="content-h2">📎 Document joint</h2>
+                <div className="pub-document-card">
+                  <div className="pub-document-header">
+                    <span className="doc-icon">
+                      {pub.document_url.toLowerCase().includes('.doc') ? '📄' : '📕'}
+                    </span>
+                    <div className="doc-info">
+                      <p className="doc-name">
+                        {decodeURIComponent(pub.document_url.split('/').pop().split('?')[0])}
+                      </p>
+                      <p className="doc-type">
+                        {pub.document_url.toLowerCase().includes('.doc') ? 'Document Word' : 'Document PDF'}
+                      </p>
                     </div>
-                    {isPdf && (
-                      <div className="pub-pdf-viewer">
-                        <iframe
-                          src={'https://docs.google.com/viewer?url=' + encodeURIComponent(pub.document_url) + '&embedded=true'}
-                          title="Aperçu du document"
-                          className="pdf-iframe"
-                          frameBorder="0"
-                          allow="autoplay"
-                        />
-                      </div>
-                    )}
+                    <a href={pub.document_url} download target="_blank" rel="noopener noreferrer" className="btn btn-download">
+                      ⬇️ Télécharger
+                    </a>
                   </div>
+                  {!pub.document_url.toLowerCase().includes('.doc') && (
+                    <div className="pub-pdf-viewer">
+                      <iframe
+                        src={'https://docs.google.com/viewer?url=' + encodeURIComponent(pub.document_url) + '&embedded=true'}
+                        title="Aperçu du document"
+                        className="pdf-iframe"
+                        frameBorder="0"
+                      />
+                    </div>
+                  )}
                 </div>
-              );
-            })()}
+              </div>
+            )}
 
           </div>
 
