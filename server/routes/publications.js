@@ -55,7 +55,7 @@ router.get('/:id', async (req, res) => {
 router.post('/', authMiddleware, async (req, res) => {
   const { 
     type, titre, description, contenu, image, document_url,
-    date_debut, date_fin, lieu, places_disponibles, prix, statut 
+    date_debut, date_fin, lieu, places_disponibles, prix, statut, show_form
   } = req.body;
 
   if (!type || !titre) {
@@ -68,13 +68,13 @@ router.post('/', authMiddleware, async (req, res) => {
     const [[{ nextId }]] = await db.query('SELECT COALESCE(MAX(id), 0) + 1 AS nextId FROM publications');
     await db.query(
       `INSERT INTO publications 
-       (id, type, titre, description, contenu, image, document_url, date_debut, date_fin, lieu, places_disponibles, prix, statut, date_publication) 
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+       (id, type, titre, description, contenu, image, document_url, date_debut, date_fin, lieu, places_disponibles, prix, statut, date_publication, show_form) 
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         nextId, type, titre, description || '', contenu || '', image || null, document_url || null,
         date_debut || null, date_fin || null, lieu || null, 
         places_disponibles ? parseInt(places_disponibles) : null, 
-        prix || null, statut || 'brouillon', datePub
+        prix || null, statut || 'brouillon', datePub, show_form ? 1 : 0
       ]
     );
 
@@ -93,7 +93,7 @@ router.put('/:id', authMiddleware, async (req, res) => {
   const { id } = req.params;
   const { 
     type, titre, description, contenu, image, document_url,
-    date_debut, date_fin, lieu, places_disponibles, prix, statut 
+    date_debut, date_fin, lieu, places_disponibles, prix, statut, show_form
   } = req.body;
 
   if (!type || !titre) {
@@ -118,13 +118,13 @@ router.put('/:id', authMiddleware, async (req, res) => {
       `UPDATE publications SET 
         type = ?, titre = ?, description = ?, contenu = ?, image = ?, 
         date_debut = ?, date_fin = ?, lieu = ?, places_disponibles = ?, 
-        prix = ?, statut = ?, date_publication = ?, updated_at = NOW() 
+        prix = ?, statut = ?, date_publication = ?, show_form = ?, updated_at = NOW() 
        WHERE id = ?`,
       [
         type, titre, description || '', contenu || '', image || null, 
         date_debut || null, date_fin || null, lieu || null, 
         places_disponibles ? parseInt(places_disponibles) : null, 
-        prix || null, statut || 'brouillon', datePub, id
+        prix || null, statut || 'brouillon', datePub, show_form ? 1 : 0, id
       ]
     );
 
@@ -191,6 +191,22 @@ router.patch('/:id/visible', authMiddleware, async (req, res) => {
     res.json({ message: 'Visibilité mise à jour.' });
   } catch (error) {
     console.error('Error toggling visibility:', error);
+    res.status(500).json({ message: 'Erreur serveur.' });
+  }
+});
+
+// PATCH /api/publications/:id/show_form - Toggle inscription form visibility
+router.patch('/:id/show_form', authMiddleware, async (req, res) => {
+  const { show_form } = req.body;
+  try {
+    const [result] = await db.query(
+      'UPDATE publications SET show_form = ?, updated_at = NOW() WHERE id = ?',
+      [show_form ? 1 : 0, req.params.id]
+    );
+    if (result.affectedRows === 0) return res.status(404).json({ message: 'Publication non trouvee.' });
+    res.json({ message: 'Formulaire mis a jour.' });
+  } catch (error) {
+    console.error('Error toggling show_form:', error);
     res.status(500).json({ message: 'Erreur serveur.' });
   }
 });

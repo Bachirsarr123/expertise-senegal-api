@@ -42,6 +42,7 @@ const GestionPublications = ({ triggerToast, triggerConfirm }) => {
   const [formStatut, setFormStatut] = useState('brouillon');
   const [formDocumentUrl, setFormDocumentUrl] = useState('');
   const [uploadingDoc, setUploadingDoc] = useState(false);
+  const [formShowForm, setFormShowForm] = useState(false);
   const [catalogueUrl, setCatalogueUrl] = useState('');
   const [uploadingCatalogue, setUploadingCatalogue] = useState(false);
   const [savingCatalogue, setSavingCatalogue] = useState(false);
@@ -156,6 +157,7 @@ const GestionPublications = ({ triggerToast, triggerConfirm }) => {
     setFormPrix('');
     setFormStatut('brouillon');
     setFormDocumentUrl('');
+    setFormShowForm(false);
     setView('create');
   };
 
@@ -167,6 +169,7 @@ const GestionPublications = ({ triggerToast, triggerConfirm }) => {
     setFormContenu(pub.contenu || '');
     setFormImage(pub.image || '');
     setFormDocumentUrl(pub.document_url || '');
+    setFormShowForm(pub.show_form === 1);
     
     // Format dates for inputs (YYYY-MM-DD)
     setFormDateDebut(pub.date_debut ? pub.date_debut.substring(0, 10) : '');
@@ -199,6 +202,7 @@ const GestionPublications = ({ triggerToast, triggerConfirm }) => {
       contenu: formContenu,
       image: formImage,
       document_url: formDocumentUrl,
+      show_form: formShowForm ? 1 : 0,
       date_debut: formDateDebut || null,
       date_fin: formDateFin || null,
       lieu: formType === 'formation' ? formLieu : null,
@@ -428,6 +432,7 @@ const GestionPublications = ({ triggerToast, triggerConfirm }) => {
                     <th>Type</th>
                     <th>Statut</th>
                     <th>Affichage public</th>
+                    <th>Formulaire</th>
                     <th>Date début</th>
                     <th>Inscrits</th>
                     <th>Actions</th>
@@ -483,6 +488,24 @@ const GestionPublications = ({ triggerToast, triggerConfirm }) => {
                             title={pub.visible === 0 ? 'Cliquer pour afficher sur le site' : 'Cliquer pour masquer du site'}
                           >
                             {pub.visible === 0 ? '🙈 Masqué' : '👁️ Affiché'}
+                          </button>
+                        </td>
+                        <td style={{ textAlign: 'center' }}>
+                          <button
+                            onClick={() => handleToggleShowForm(pub)}
+                            style={{
+                              background: pub.show_form === 1 ? '#D1FAE5' : '#F3F4F6',
+                              border: 'none',
+                              borderRadius: '20px',
+                              padding: '6px 14px',
+                              cursor: 'pointer',
+                              fontWeight: 600,
+                              fontSize: '0.82rem',
+                              color: pub.show_form === 1 ? '#065F46' : '#6B7280'
+                            }}
+                            title={pub.show_form === 1 ? 'Masquer le formulaire' : 'Afficher le formulaire'}
+                          >
+                            {pub.show_form === 1 ? '📝 Activé' : '— Désactivé'}
                           </button>
                         </td>
                         <td>
@@ -687,7 +710,24 @@ const GestionPublications = ({ triggerToast, triggerConfirm }) => {
                 <select value={formStatut} onChange={e => setFormStatut(e.target.value)}>
                   <option value="brouillon">🟡 Brouillon (Invisible sur le site)</option>
                   <option value="publie">🟢 Publié (Visible immédiatement)</option>
-                  <option value="archive">⚫ Archivé (Invisible sur le site)</option>
+                  <option value="archive">⚫ Archivé (Invis              <div className="form-group">
+                <label>Formulaire d'inscription</label>
+                <label style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer', marginTop: '8px' }}>
+                  <input
+                    type="checkbox"
+                    checked={formShowForm}
+                    onChange={e => setFormShowForm(e.target.checked)}
+                    style={{ width: '18px', height: '18px', cursor: 'pointer' }}
+                  />
+                  <span style={{ fontSize: '0.9rem' }}>
+                    Afficher le formulaire d'inscription sur la page publique
+                  </span>
+                </label>
+                <p style={{ fontSize: '0.75rem', color: 'var(--texte-moyen)', marginTop: '4px' }}>
+                  Si non coché : seuls le contenu et le document seront visibles.
+                </p>
+              </div>
+              ible sur le site)</option>
                 </select>
               </div>
             </div>

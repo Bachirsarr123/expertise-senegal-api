@@ -186,6 +186,12 @@ async function createTables() {
       await pool.query(`ALTER TABLE publications ADD COLUMN document_url VARCHAR(500) DEFAULT NULL`);
       console.log('Column document_url added to publications.');
     } catch (e) { /* colonne deja existante */ }
+    // Migration: ajouter show_form a publications si absente
+    try {
+      await pool.query('ALTER TABLE publications ADD COLUMN show_form TINYINT(1) NOT NULL DEFAULT 0');
+      console.log('Column show_form added to publications.');
+    } catch (e) { /* colonne deja existante */ }
+
     // Migration: ajouter visible a publications si absente
     try {
       await pool.query('ALTER TABLE publications ADD COLUMN visible TINYINT(1) NOT NULL DEFAULT 1');

@@ -338,3 +338,14 @@
   .pub-document-header { flex-wrap: wrap; }
   .pdf-iframe { height: 400px; }
 }
+/* Full-width layout when form is hidden */
+.pub-detail-layout-full {
+  display: block;
+  max-width: 860px;
+  margin: 0 auto;
+}
+
+.pub-detail-layout-full .pub-content-col {
+  width: 100%;
+  max-width: 100%;
+}
