@@ -152,7 +152,7 @@ const Dashboard = () => {
             className={`nav-item-btn ${activeTab === 'publications' ? 'active' : ''}`}
             onClick={() => setActiveTab('publications')}
           >
-            <span className="nav-icon">📢</span> Catalogue Formation
+            <span className="nav-icon">📢</span> Catalogue de Formation
           </button>
 
           <button 

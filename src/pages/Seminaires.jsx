@@ -11,7 +11,7 @@ const Seminaires = () => {
   const [activeFilter, setActiveFilter] = useState('formation');
   const [heroBgImage, setHeroBgImage] = useState('https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&q=80&w=1920');
   const [heroBadge, setHeroBadge] = useState('CATALOGUE FORMATION - EXPERTISE SENEGAL');
-  const [heroTitle, setHeroTitle] = useState('Catalogue Formation');
+  const [heroTitle, setHeroTitle] = useState('Catalogue de Formation');
   const [heroSubtitle, setHeroSubtitle] = useState('Retrouvez toutes nos formations continues, seminaires professionnels, appels a candidatures et actualites.');
   const [catalogueUrl, setCatalogueUrl] = useState('');
 
@@ -107,7 +107,7 @@ const Seminaires = () => {
                 className='btn btn-secondary'
                 style={{ display: 'inline-flex', alignItems: 'center', gap: '10px', padding: '14px 28px', fontSize: '1rem' }}
               >
-                <span>📥</span> Télécharger le Catalogue Formation (PDF)
+                <span>📥</span> Télécharger le Catalogue de Formation (PDF)
               </a>
             </div>
           )}

@@ -540,10 +540,10 @@ const GestionPublications = ({ triggerToast, triggerConfirm }) => {
       {view === 'list' && (
         <div className="admin-card" style={{ marginTop: '24px', background: '#F0F9FF', border: '1px solid #BAE6FD' }}>
           <h3 style={{ color: 'var(--bleu-marine)', marginBottom: '12px' }}>
-            📥 Catalogue Formation — PDF téléchargeable
+            📥 Catalogue de Formation — PDF téléchargeable
           </h3>
           <p style={{ fontSize: '0.85rem', color: 'var(--texte-moyen)', marginBottom: '16px' }}>
-            Ce fichier PDF sera proposé en téléchargement sur la page publique Catalogue Formation.
+            Ce fichier PDF sera proposé en téléchargement sur la page publique Catalogue de Formation.
           </p>
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
             <label style={{

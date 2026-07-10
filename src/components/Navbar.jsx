@@ -42,7 +42,7 @@ const Navbar = () => {
             </li>
             <li>
               <NavLink to="/seminaires" onClick={closeMenu} className={({ isActive }) => isActive ? 'active-link' : ''}>
-                Catalogue Formation
+                Catalogue de Formation
               </NavLink>
             </li>
             <li>
