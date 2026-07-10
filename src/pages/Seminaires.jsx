@@ -25,7 +25,12 @@ const Seminaires = () => {
   const fetchPublications = async () => {
     try {
       const response = await axios.get('https://expertise-senegal-api-olf5.onrender.com/api/publications/public');
-      setPublications(response.data);
+      const data = response.data;
+      setPublications(data);
+      // Auto-select the first type that has publications
+      const order = ['formation', 'appel_candidature', 'actualite'];
+      const firstAvailable = order.find(t => data.some(p => p.type === t));
+      if (firstAvailable) setActiveFilter(firstAvailable);
       setLoading(false);
     } catch (error) {
       console.error('Error fetching public publications:', error);
@@ -80,22 +85,28 @@ const Seminaires = () => {
       <section className="publications-grid-section section-padding">
         <div className="container">
           
-          {/* Filters */}
-          <div className="pub-filters">
-            {[
-              { id: 'formation', label: '📚 Formations' },
-              { id: 'appel_candidature', label: '📣 Appels à candidatures' },
-              { id: 'actualite', label: '📰 Actualités' }
-            ].map(filter => (
-              <button
-                key={filter.id}
-                className={`pub-filter-btn ${activeFilter === filter.id ? 'active' : ''}`}
-                onClick={() => setActiveFilter(filter.id)}
-              >
-                {filter.label}
-              </button>
-            ))}
-          </div>
+          {/* Filters — only show types that have published content */}
+          {[
+            { id: 'formation', label: '📚 Formations' },
+            { id: 'appel_candidature', label: '📣 Appels à candidatures' },
+            { id: 'actualite', label: '📰 Actualités' }
+          ].filter(f => publications.some(p => p.type === f.id)).length > 0 && (
+            <div className="pub-filters">
+              {[
+                { id: 'formation', label: '📚 Formations' },
+                { id: 'appel_candidature', label: '📣 Appels à candidatures' },
+                { id: 'actualite', label: '📰 Actualités' }
+              ].filter(f => publications.some(p => p.type === f.id)).map(filter => (
+                <button
+                  key={filter.id}
+                  className={`pub-filter-btn ${activeFilter === filter.id ? 'active' : ''}`}
+                  onClick={() => setActiveFilter(filter.id)}
+                >
+                  {filter.label}
+                </button>
+              ))}
+            </div>
+          )}
 
           {catalogueUrl && (
             <div style={{ textAlign: 'center', marginBottom: '32px' }}>
