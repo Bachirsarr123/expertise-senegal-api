@@ -141,6 +141,18 @@ async function createTables() {
       )
     `);
 
+    // 8. Client References
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS \`client_references\` (
+        id INT PRIMARY KEY AUTO_INCREMENT,
+        nom VARCHAR(255) NOT NULL,
+        logo_url VARCHAR(500) DEFAULT NULL,
+        secteur VARCHAR(150) DEFAULT NULL,
+        ordre INT DEFAULT 0,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+
     // Seed default settings
     const defaultSettings = [
       { cle: 'site_name', valeur: 'Expertise Sénégal' },
@@ -174,6 +186,15 @@ async function createTables() {
       await pool.query(`ALTER TABLE publications ADD COLUMN document_url VARCHAR(500) DEFAULT NULL`);
       console.log('Column document_url added to publications.');
     } catch (e) { /* colonne deja existante */ }
+    // Migration: ajouter visible a publications si absente
+    try {
+      await pool.query('ALTER TABLE publications ADD COLUMN visible TINYINT(1) NOT NULL DEFAULT 1');
+      console.log('Column visible added to publications.');
+    } catch (e) { /* colonne deja existante */ }
+
+    // Seed catalogue_url in parametres
+    await pool.query('INSERT IGNORE INTO parametres (cle, valeur) VALUES (?, ?)', ['catalogue_url', '']);
+
     console.log('Database tables verified and seeded successfully.');
   } catch (error) {
     console.error('Error creating/seeding tables:', error.message);

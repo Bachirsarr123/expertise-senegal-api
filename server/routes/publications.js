@@ -8,7 +8,7 @@ router.get('/public', async (req, res) => {
   try {
     const [rows] = await db.query(
       `SELECT * FROM publications 
-       WHERE statut = 'publie' 
+       WHERE statut = 'publie' AND (visible IS NULL OR visible = 1)
        ORDER BY date_publication DESC, id DESC`
     );
     res.json(rows);
@@ -178,4 +178,20 @@ router.delete('/:id', authMiddleware, async (req, res) => {
   }
 });
 
+
+// PATCH /api/publications/:id/visible - Toggle visibility (Admin protected)
+router.patch('/:id/visible', authMiddleware, async (req, res) => {
+  const { visible } = req.body;
+  try {
+    const [result] = await db.query(
+      'UPDATE publications SET visible = ?, updated_at = NOW() WHERE id = ?',
+      [visible ? 1 : 0, req.params.id]
+    );
+    if (result.affectedRows === 0) return res.status(404).json({ message: 'Publication non trouvée.' });
+    res.json({ message: 'Visibilité mise à jour.' });
+  } catch (error) {
+    console.error('Error toggling visibility:', error);
+    res.status(500).json({ message: 'Erreur serveur.' });
+  }
+});
 module.exports = router;

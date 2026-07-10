@@ -23,6 +23,7 @@ app.use('/api/messages', require('./routes/messages'));
 app.use('/api/media', require('./routes/media'));
 app.use('/api/publications', require('./routes/publications'));
 app.use('/api/inscriptions', require('./routes/inscriptions'));
+app.use('/api/references', require('./routes/references'));
 
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', message: 'Expertise Sénégal API is running.' });

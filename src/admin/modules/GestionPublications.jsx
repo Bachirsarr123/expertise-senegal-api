@@ -42,10 +42,14 @@ const GestionPublications = ({ triggerToast, triggerConfirm }) => {
   const [formStatut, setFormStatut] = useState('brouillon');
   const [formDocumentUrl, setFormDocumentUrl] = useState('');
   const [uploadingDoc, setUploadingDoc] = useState(false);
+  const [catalogueUrl, setCatalogueUrl] = useState('');
+  const [uploadingCatalogue, setUploadingCatalogue] = useState(false);
+  const [savingCatalogue, setSavingCatalogue] = useState(false);
 
   useEffect(() => {
     fetchPublications();
     fetchHeroContent();
+    fetchCatalogueUrl();
   }, []);
 
   const fetchPublications = async () => {
@@ -74,6 +78,40 @@ const GestionPublications = ({ triggerToast, triggerConfirm }) => {
     } catch {
       triggerToast('Erreur chargement hero Seminaires.', 'error');
     }
+  };
+
+  const fetchCatalogueUrl = async () => {
+    try {
+      const { data } = await axiosInstance.get('/api/content/parametres');
+      if (data.catalogue_url !== undefined) setCatalogueUrl(data.catalogue_url);
+    } catch { /* ignore */ }
+  };
+
+  const handleCatalogueUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const ext = file.name.split('.').pop().toLowerCase();
+    if (ext !== 'pdf') { triggerToast('Seuls les fichiers PDF sont acceptés.', 'error'); return; }
+    setUploadingCatalogue(true);
+    try {
+      const formData = new FormData();
+      formData.append('document', file);
+      const { data } = await axiosInstance.post('/api/media/upload-document', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
+      setCatalogueUrl(data.url);
+      triggerToast('PDF téléversé. Cliquez sur Enregistrer pour sauvegarder.');
+    } catch { triggerToast('Erreur lors du téléversement.', 'error'); }
+    finally { setUploadingCatalogue(false); e.target.value = ''; }
+  };
+
+  const saveCatalogueUrl = async () => {
+    setSavingCatalogue(true);
+    try {
+      await axiosInstance.put('/api/content/parametres', { catalogue_url: catalogueUrl });
+      triggerToast('Catalogue PDF enregistré.');
+    } catch { triggerToast('Erreur sauvegarde catalogue.', 'error'); }
+    finally { setSavingCatalogue(false); }
   };
 
   const saveHeroContent = () => {
@@ -211,6 +249,15 @@ const GestionPublications = ({ triggerToast, triggerConfirm }) => {
       console.error('Error changing publication status:', error);
       triggerToast('Erreur de changement de statut.', 'error');
     }
+  };
+
+  const handleToggleVisible = async (pub) => {
+    const newVisible = pub.visible === 0 ? 1 : 0;
+    try {
+      await axiosInstance.patch('/api/publications/' + pub.id + '/visible', { visible: newVisible });
+      triggerToast(newVisible === 1 ? 'Publication affichée sur le site.' : 'Publication masquée du site.');
+      fetchPublications();
+    } catch { triggerToast('Erreur de changement de visibilité.', 'error'); }
   };
 
   // Inscriptions Handlers
@@ -449,6 +496,16 @@ const GestionPublications = ({ triggerToast, triggerConfirm }) => {
                             >
                               🔗 Voir
                             </a>
+                                                        {(pub.type === 'appel_candidature' || pub.type === 'actualite') && (
+                              <button
+                                className="admin-btn admin-btn-outline"
+                                style={{ padding: '6px 10px', fontSize: '0.8rem', color: pub.visible === 0 ? '#EF4444' : '#059669' }}
+                                onClick={() => handleToggleVisible(pub)}
+                                title={pub.visible === 0 ? 'Afficher sur le site' : 'Masquer du site'}
+                              >
+                                {pub.visible === 0 ? '🙈 Masqué' : '👁️ Visible'}
+                              </button>
+                            )}
                             <button 
                               className="admin-btn admin-btn-outline" 
                               style={{ 
@@ -476,6 +533,50 @@ const GestionPublications = ({ triggerToast, triggerConfirm }) => {
               </table>
             </div>
           )}
+        </div>
+      )}
+
+      {/* Catalogue PDF */}
+      {view === 'list' && (
+        <div className="admin-card" style={{ marginTop: '24px', background: '#F0F9FF', border: '1px solid #BAE6FD' }}>
+          <h3 style={{ color: 'var(--bleu-marine)', marginBottom: '12px' }}>
+            📥 Catalogue Formation — PDF téléchargeable
+          </h3>
+          <p style={{ fontSize: '0.85rem', color: 'var(--texte-moyen)', marginBottom: '16px' }}>
+            Ce fichier PDF sera proposé en téléchargement sur la page publique Catalogue Formation.
+          </p>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
+            <label style={{
+              display: 'inline-flex', alignItems: 'center', gap: '8px',
+              background: '#fff', border: '1.5px dashed #93C5FD',
+              borderRadius: '8px', padding: '10px 20px',
+              cursor: uploadingCatalogue ? 'not-allowed' : 'pointer', fontSize: '0.9rem'
+            }}>
+              <input type="file" accept=".pdf" onChange={handleCatalogueUpload} style={{ display: 'none' }} disabled={uploadingCatalogue} />
+              {uploadingCatalogue ? '⏳ Téléversement...' : '📎 Choisir un PDF catalogue'}
+            </label>
+            {catalogueUrl && (
+              <a href={catalogueUrl} target="_blank" rel="noopener noreferrer" style={{ fontSize: '0.85rem', color: 'var(--or)' }}>
+                📕 Voir le catalogue actuel →
+              </a>
+            )}
+            {catalogueUrl && (
+              <button type="button" onClick={() => setCatalogueUrl('')} style={{ background: 'none', border: 'none', color: '#EF4444', cursor: 'pointer' }}>
+                ✕ Retirer
+              </button>
+            )}
+          </div>
+          <div style={{ marginTop: '14px' }}>
+            <button
+              type="button"
+              className="admin-btn admin-btn-secondary"
+              onClick={saveCatalogueUrl}
+              disabled={savingCatalogue}
+              style={{ padding: '8px 20px' }}
+            >
+              {savingCatalogue ? '⏳ Enregistrement...' : '💾 Enregistrer le catalogue'}
+            </button>
+          </div>
         </div>
       )}
 

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 import { NavLink, Link } from 'react-router-dom';
 import logoImg from '../assets/logo.png';
 import './Navbar.css';
@@ -42,7 +42,12 @@ const Navbar = () => {
             </li>
             <li>
               <NavLink to="/seminaires" onClick={closeMenu} className={({ isActive }) => isActive ? 'active-link' : ''}>
-                Séminaires &amp; Formations
+                Catalogue Formation
+              </NavLink>
+            </li>
+            <li>
+              <NavLink to="/references" onClick={closeMenu} className={({ isActive }) => isActive ? 'active-link' : ''}>
+                Nos Références
               </NavLink>
             </li>
             <li>

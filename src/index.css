@@ -1,4 +1,4 @@
-:root {
+﻿:root {
   --bleu-marine: #1a2456;
   --or: #C9952A;
   --blanc: #FFFFFF;
@@ -21,9 +21,13 @@ html {
 
 body {
   margin: 0;
-  background-color: var(--blanc);
+  background-color: var(--bleu-marine);
   color: var(--texte-fonce);
   line-height: 1.6;
+}
+
+.section-padding {
+  background-color: var(--blanc);
 }
 
 a {

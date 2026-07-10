@@ -1,4 +1,4 @@
-import { useState, useEffect, lazy, Suspense } from 'react';
+﻿import { useState, useEffect, lazy, Suspense } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { HelmetProvider } from 'react-helmet-async';
 import axios from 'axios';
@@ -14,6 +14,7 @@ const Domaines = lazy(() => import('./pages/Domaines'));
 const Seminaires = lazy(() => import('./pages/Seminaires'));
 const SeminaireDetail = lazy(() => import('./pages/SeminaireDetail'));
 const Contact = lazy(() => import('./pages/Contact'));
+const References = lazy(() => import('./pages/References'));
 
 import Maintenance from './pages/Maintenance';
 import Login from './admin/Login';
@@ -120,6 +121,7 @@ function App() {
                       <Route path="/seminaires" element={<Seminaires />} />
                       <Route path="/seminaires/:id" element={<SeminaireDetail />} />
                       <Route path="/contact" element={<Contact />} />
+                      <Route path="/references" element={<References />} />
                     </Routes>
                   </Suspense>
                 </main>

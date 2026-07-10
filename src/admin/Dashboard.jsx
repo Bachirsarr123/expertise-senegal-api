@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+﻿import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import logoImg from '../assets/logo.png';
 import './Dashboard.css';
@@ -13,6 +13,7 @@ import GestionMessages from './modules/GestionMessages';
 import GestionMedias from './modules/GestionMedias';
 import GestionContact from './modules/GestionContact';
 import Parametres from './modules/Parametres';
+import GestionReferences from './modules/GestionReferences';
 
 import axiosInstance from './utils/axiosInstance'; // We'll create a small axios instance with JWT header
 
@@ -151,7 +152,7 @@ const Dashboard = () => {
             className={`nav-item-btn ${activeTab === 'publications' ? 'active' : ''}`}
             onClick={() => setActiveTab('publications')}
           >
-            <span className="nav-icon">📢</span> Séminaires &amp; Formations
+            <span className="nav-icon">📢</span> Catalogue Formation
           </button>
 
           <button 
@@ -281,6 +282,11 @@ const Dashboard = () => {
           {/* Module 3.5: Publications */}
           {activeTab === 'publications' && (
             <GestionPublications triggerToast={triggerToast} triggerConfirm={triggerConfirm} />
+          )}
+
+          {/* Module: Références Clients */}
+          {activeTab === 'references' && (
+            <GestionReferences triggerToast={triggerToast} triggerConfirm={triggerConfirm} />
           )}
 
           {/* Module 3.6: Inscriptions */}

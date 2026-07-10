@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+﻿import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 import SEO from '../components/SEO';
@@ -10,13 +10,15 @@ const Seminaires = () => {
   const [loading, setLoading] = useState(true);
   const [activeFilter, setActiveFilter] = useState('formation');
   const [heroBgImage, setHeroBgImage] = useState('https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&q=80&w=1920');
-  const [heroBadge, setHeroBadge] = useState('SEMINAIRES & FORMATIONS - EXPERTISE SENEGAL');
-  const [heroTitle, setHeroTitle] = useState('Seminaires & Formations');
+  const [heroBadge, setHeroBadge] = useState('CATALOGUE FORMATION - EXPERTISE SENEGAL');
+  const [heroTitle, setHeroTitle] = useState('Catalogue Formation');
   const [heroSubtitle, setHeroSubtitle] = useState('Retrouvez toutes nos formations continues, seminaires professionnels, appels a candidatures et actualites.');
+  const [catalogueUrl, setCatalogueUrl] = useState('');
 
   useEffect(() => {
     fetchPublications();
     fetchHeroContent();
+    fetchCatalogueUrl();
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, []);
 
@@ -44,6 +46,13 @@ const Seminaires = () => {
     } catch (err) {
       console.warn('Could not load seminaires hero content.');
     }
+  };
+
+  const fetchCatalogueUrl = async () => {
+    try {
+      const { data } = await axios.get('https://expertise-senegal-api-olf5.onrender.com/api/content/parametres');
+      if (data.catalogue_url) setCatalogueUrl(data.catalogue_url);
+    } catch (err) { /* ignore */ }
   };
 
   const filteredPublications = publications.filter(pub => {
@@ -87,6 +96,21 @@ const Seminaires = () => {
               </button>
             ))}
           </div>
+
+          {catalogueUrl && (
+            <div style={{ textAlign: 'center', marginBottom: '32px' }}>
+              <a
+                href={catalogueUrl}
+                target='_blank'
+                rel='noopener noreferrer'
+                download
+                className='btn btn-secondary'
+                style={{ display: 'inline-flex', alignItems: 'center', gap: '10px', padding: '14px 28px', fontSize: '1rem' }}
+              >
+                <span>📥</span> Télécharger le Catalogue Formation (PDF)
+              </a>
+            </div>
+          )}
 
           {loading ? (
             <div className="pub-loading">Chargement des éléments en cours...</div>
