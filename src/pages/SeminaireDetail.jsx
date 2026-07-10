@@ -49,6 +49,13 @@ const SeminaireDetail = () => {
     } finally { setSubmitting(false); }
   };
 
+  const getDownloadUrl = (url) => {
+    if (url && url.includes('cloudinary.com')) {
+      return url.replace('/upload/', '/upload/fl_attachment/');
+    }
+    return url;
+  };
+
   const handleWhatsAppContact = () => {
     if (!pub) return;
     const fullName = (prenom.trim() + ' ' + nom.trim()).trim() || '[Votre Nom]';
@@ -152,14 +159,14 @@ const SeminaireDetail = () => {
                         <p className="doc-name">{decodeURIComponent(pub.document_url.split('/').pop().split('?')[0])}</p>
                         <p className="doc-type">{pub.document_url.toLowerCase().includes('.doc') ? 'Document Word' : 'Document PDF'}</p>
                       </div>
-                      <a href={pub.document_url} download target="_blank" rel="noopener noreferrer" className="btn btn-download">
+                      <a href={getDownloadUrl(pub.document_url)} target="_blank" rel="noopener noreferrer" className="btn btn-download">
                         Telecharger
                       </a>
                     </div>
                     {!pub.document_url.toLowerCase().includes('.doc') && (
                       <div className="pub-pdf-viewer">
                         <iframe
-                          src={'https://docs.google.com/viewer?url=' + encodeURIComponent(pub.document_url) + '&embedded=true'}
+                          src={pub.document_url}
                           title="Apercu du document"
                           className="pdf-iframe"
                           frameBorder="0"
