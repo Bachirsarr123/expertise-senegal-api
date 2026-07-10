@@ -427,6 +427,7 @@ const GestionPublications = ({ triggerToast, triggerConfirm }) => {
                     <th>Titre</th>
                     <th>Type</th>
                     <th>Statut</th>
+                    <th>Affichage public</th>
                     <th>Date début</th>
                     <th>Inscrits</th>
                     <th>Actions</th>
@@ -465,6 +466,25 @@ const GestionPublications = ({ triggerToast, triggerConfirm }) => {
                             {pub.statut === 'publie' ? 'Publié' : pub.statut === 'brouillon' ? 'Brouillon' : 'Archivé'}
                           </span>
                         </td>
+                        <td style={{ textAlign: 'center' }}>
+                          <button
+                            onClick={() => handleToggleVisible(pub)}
+                            style={{
+                              background: pub.visible === 0 ? '#FEE2E2' : '#D1FAE5',
+                              border: 'none',
+                              borderRadius: '20px',
+                              padding: '6px 14px',
+                              cursor: 'pointer',
+                              fontWeight: 600,
+                              fontSize: '0.82rem',
+                              color: pub.visible === 0 ? '#B91C1C' : '#065F46',
+                              whiteSpace: 'nowrap'
+                            }}
+                            title={pub.visible === 0 ? 'Cliquer pour afficher sur le site' : 'Cliquer pour masquer du site'}
+                          >
+                            {pub.visible === 0 ? '🙈 Masqué' : '👁️ Affiché'}
+                          </button>
+                        </td>
                         <td>
                           {pub.date_debut ? new Date(pub.date_debut).toLocaleDateString('fr-FR') : '—'}
                         </td>
@@ -496,16 +516,7 @@ const GestionPublications = ({ triggerToast, triggerConfirm }) => {
                             >
                               🔗 Voir
                             </a>
-                                                        {(pub.type === 'appel_candidature' || pub.type === 'actualite') && (
-                              <button
-                                className="admin-btn admin-btn-outline"
-                                style={{ padding: '6px 10px', fontSize: '0.8rem', color: pub.visible === 0 ? '#EF4444' : '#059669' }}
-                                onClick={() => handleToggleVisible(pub)}
-                                title={pub.visible === 0 ? 'Afficher sur le site' : 'Masquer du site'}
-                              >
-                                {pub.visible === 0 ? '🙈 Masqué' : '👁️ Visible'}
-                              </button>
-                            )}
+
                             <button 
                               className="admin-btn admin-btn-outline" 
                               style={{ 
