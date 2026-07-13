@@ -131,34 +131,4 @@ router.post('/upload-document', authMiddleware, uploadDoc.single('document'), as
   }
 });
 
-// GET download proxy - uses Cloudinary Admin API (signed) to bypass raw resource restrictions
-router.get('/download', (req, res) => {
-  const fileUrl = req.query.url;
-  if (!fileUrl) return res.status(400).json({ message: 'URL manquante.' });
-
-  try {
-    const crypto = require('crypto');
-    const urlObj = new URL(fileUrl);
-    const afterUpload = urlObj.pathname.substring(urlObj.pathname.indexOf('/upload/') + 8);
-    const parts = afterUpload.split('/'); const publicId = /^v[0-9]+$/.test(parts[0]) ? parts.slice(1).join('/') : afterUpload;
-
-    const config = cloudinary.config();
-    const timestamp = Math.floor(Date.now() / 1000);
-    const toSign = 'public_id=' + publicId + '&timestamp=' + timestamp + config.api_secret;
-    const signature = crypto.createHash('sha1').update(toSign).digest('hex');
-
-    const downloadUrl = 'https://api.cloudinary.com/v1_1/' + config.cloud_name + '/raw/download'
-      + '?public_id=' + encodeURIComponent(publicId)
-      + '&api_key=' + config.api_key
-      + '&timestamp=' + timestamp
-      + '&signature=' + signature;
-
-    console.log('Download redirect for:', publicId);
-    res.redirect(302, downloadUrl);
-  } catch (error) {
-    console.error('Download error:', error.message);
-    res.status(500).json({ message: 'Erreur lors du telechargement.' });
-  }
-});
-
 module.exports = router;
