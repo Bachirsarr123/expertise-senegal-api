@@ -132,30 +132,50 @@ router.post('/upload-document', authMiddleware, uploadDoc.single('document'), as
 });
 
 
-// GET download - generates signed Cloudinary URL and redirects
-router.get('/download', (req, res) => {
+module.exports = router;
+// GET download - manually signed Cloudinary URL, proxied server-side
+router.get('/download', async (req, res) => {
   const fileUrl = req.query.url;
   if (!fileUrl) return res.status(400).json({ message: 'URL manquante.' });
 
   try {
-    const urlObj = new URL(fileUrl);
-    const afterUpload = urlObj.pathname.substring(urlObj.pathname.indexOf('/upload/') + 8);
+    const crypto = require('crypto');
+    const { Readable } = require('stream');
+    const config = cloudinary.config();
+
+    // Extract path after /upload/, strip version prefix
+    const uploadMarker = '/upload/';
+    const uploadIdx = fileUrl.indexOf(uploadMarker);
+    const afterUpload = fileUrl.substring(uploadIdx + uploadMarker.length);
     const parts = afterUpload.split('/');
-    const publicId = /^v[0-9]+$/.test(parts[0]) ? parts.slice(1).join('/') : afterUpload;
+    const pathParts = /^v[0-9]+$/.test(parts[0]) ? parts.slice(1) : parts;
+    const signPath = '/' + pathParts.join('/');
+    // e.g. /expertise-senegal/documents/attesation_1783686092352.pdf
 
-    const signedUrl = cloudinary.url(publicId, {
-      resource_type: 'raw',
-      type: 'upload',
-      sign_url: true,
-      secure: true
-    });
+    // Cloudinary signature: SHA256(path + api_secret) -> base64url -> first 8 chars
+    const rawHash = crypto.createHash('sha256')
+      .update(signPath + config.api_secret)
+      .digest('base64url');
+    const sig = rawHash.substring(0, 8);
 
-    console.log('[download] publicId:', publicId);
+    const signedUrl = 'https://res.cloudinary.com/' + config.cloud_name + '/raw/upload/s--' + sig + '--' + signPath;
     console.log('[download] signedUrl:', signedUrl);
-    res.redirect(302, signedUrl);
+
+    const response = await fetch(signedUrl);
+    console.log('[download] status:', response.status);
+
+    if (!response.ok) {
+      return res.status(response.status).json({ message: 'Cloudinary ' + response.status });
+    }
+
+    const filename = decodeURIComponent(pathParts[pathParts.length - 1]) || 'document.pdf';
+    res.setHeader('Content-Disposition', 'attachment; filename="' + filename + '"');
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    Readable.fromWeb(response.body).pipe(res);
   } catch (error) {
     console.error('[download] error:', error.message);
-    res.status(500).json({ message: 'Erreur lors du telechargement.' });
+    res.status(500).json({ message: 'Erreur: ' + error.message });
   }
 });
 
