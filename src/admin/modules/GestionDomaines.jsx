@@ -1,4 +1,4 @@
-﻿import { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import axiosInstance from '../utils/axiosInstance';
 
 const SITE = 'https://www.expertisesenegal.com';

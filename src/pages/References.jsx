@@ -1,4 +1,4 @@
-﻿import { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import axios from 'axios';
 import SEO from '../components/SEO';
 import './References.css';
@@ -50,27 +50,27 @@ const References = () => {
   return (
     <div className="references-page">
       <SEO
-        title="Nos RÃ©fÃ©rences â€” Expertise SÃ©nÃ©gal | Dakar, SÃ©nÃ©gal"
-        description="DÃ©couvrez les institutions et entreprises qui font confiance Ã  Expertise SÃ©nÃ©gal pour leurs missions de conseil, formation et Ã©tudes."
+        title="Nos Références — Expertise Sénégal | Dakar, Sénégal"
+        description="Découvrez les institutions et entreprises qui font confiance à Expertise Sénégal pour leurs missions de conseil, formation et études."
         url="https://www.expertisesenegal.com/references"
       />
 
       <section className="references-hero">
         <div className="references-hero-overlay"></div>
         <div className="container references-hero-content">
-          <div className="references-hero-badge">NOS RÃ‰FÃ‰RENCES â€” EXPERTISE SÃ‰NÃ‰GAL</div>
-          <h1>Nos RÃ©fÃ©rences Clients</h1>
-          <p>Des institutions publiques, entreprises privÃ©es et organisations qui nous font confiance depuis 2016.</p>
+          <div className="references-hero-badge">NOS RÉFÉRENCES — EXPERTISE SÉNÉGAL</div>
+          <h1>Nos Références Clients</h1>
+          <p>Des institutions publiques, entreprises privées et organisations qui nous font confiance depuis 2016.</p>
         </div>
       </section>
 
       <section className="references-grid-section section-padding">
         <div className="container">
           {loading ? (
-            <div className="ref-loading">Chargement des rÃ©fÃ©rences...</div>
+            <div className="ref-loading">Chargement des références...</div>
           ) : references.length === 0 ? (
             <div className="ref-empty">
-              <p>Aucune rÃ©fÃ©rence disponible pour le moment.</p>
+              <p>Aucune référence disponible pour le moment.</p>
             </div>
           ) : (
             <div className="references-grid">
@@ -99,14 +99,14 @@ const References = () => {
       {!loading && domainesWithRefs.length > 0 && (
         <section className="domaine-refs-section section-padding">
           <div className="container">
-            <h2 className="section-title text-center mb-5">RÃ©fÃ©rences par domaine d'activitÃ©</h2>
+            <h2 className="section-title text-center mb-5">Références par domaine d'activité</h2>
             <div className="domaine-refs-grid">
               {domainesWithRefs.map(key => (
                 <div key={key} className="domaine-ref-block">
                   <h3 className="domaine-ref-title">{domaines[key].title}</h3>
                   <ul className="domaine-ref-list">
                     {domaines[key].references.map((ref, i) => (
-                      <li key={i} dangerouslySetInnerHTML={{ __html: ref.replace(/^([^â€”]+)â€”/, '<strong>$1</strong>â€”') }} />
+                      <li key={i} dangerouslySetInnerHTML={{ __html: ref.replace(/^([^—]+)—/, '<strong>$1</strong>—') }} />
                     ))}
                   </ul>
                 </div>
