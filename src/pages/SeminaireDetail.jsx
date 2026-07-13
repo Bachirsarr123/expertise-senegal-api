@@ -49,24 +49,9 @@ const SeminaireDetail = () => {
     } finally { setSubmitting(false); }
   };
 
-  const handleDownload = async (url) => {
-    if (!url) return;
-    const filename = decodeURIComponent(url.split('/').pop().split('?')[0]) || 'document.pdf';
-    try {
-      const resp = await fetch(url);
-      if (!resp.ok) throw new Error('HTTP ' + resp.status);
-      const blob = await resp.blob();
-      const blobUrl = URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = blobUrl;
-      link.download = filename;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      setTimeout(() => URL.revokeObjectURL(blobUrl), 1000);
-    } catch (err) {
-      window.open(url, '_blank');
-    }
+  const getSignedUrl = (url) => {
+    if (!url) return '#';
+    return 'https://expertise-senegal-api-olf5.onrender.com/api/media/download?url=' + encodeURIComponent(url);
   };
 
   const handleWhatsAppContact = () => {
@@ -172,12 +157,12 @@ const SeminaireDetail = () => {
                         <p className="doc-name">{decodeURIComponent(pub.document_url.split('/').pop().split('?')[0])}</p>
                         <p className="doc-type">{pub.document_url.toLowerCase().includes('.doc') ? 'Document Word' : 'Document PDF'}</p>
                       </div>
-                      <button type="button" onClick={() => handleDownload(pub.document_url)} className="btn btn-download">Telecharger</button>
+                      <a href={getSignedUrl(pub.document_url)} target="_blank" rel="noopener noreferrer" className="btn btn-download">Telecharger</a>
                     </div>
                     {!pub.document_url.toLowerCase().includes('.doc') && (
                       <div className="pub-pdf-viewer">
                         <iframe
-                          src={pub.document_url}
+                          src={getSignedUrl(pub.document_url)}
                           title="Apercu du document"
                           className="pdf-iframe"
                           frameBorder="0"

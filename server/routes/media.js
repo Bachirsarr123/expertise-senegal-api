@@ -131,4 +131,32 @@ router.post('/upload-document', authMiddleware, uploadDoc.single('document'), as
   }
 });
 
+
+// GET download - generates signed Cloudinary URL and redirects
+router.get('/download', (req, res) => {
+  const fileUrl = req.query.url;
+  if (!fileUrl) return res.status(400).json({ message: 'URL manquante.' });
+
+  try {
+    const urlObj = new URL(fileUrl);
+    const afterUpload = urlObj.pathname.substring(urlObj.pathname.indexOf('/upload/') + 8);
+    const parts = afterUpload.split('/');
+    const publicId = /^v[0-9]+$/.test(parts[0]) ? parts.slice(1).join('/') : afterUpload;
+
+    const signedUrl = cloudinary.url(publicId, {
+      resource_type: 'raw',
+      type: 'upload',
+      sign_url: true,
+      secure: true
+    });
+
+    console.log('[download] publicId:', publicId);
+    console.log('[download] signedUrl:', signedUrl);
+    res.redirect(302, signedUrl);
+  } catch (error) {
+    console.error('[download] error:', error.message);
+    res.status(500).json({ message: 'Erreur lors du telechargement.' });
+  }
+});
+
 module.exports = router;
