@@ -27,7 +27,6 @@ const GestionDomaines = ({ triggerToast, triggerConfirm }) => {
   });
 
   const [newItem, setNewItem] = useState('');
-  const [newRef, setNewRef] = useState('');
   const [newTheme, setNewTheme] = useState('');
 
   const [ctaTitle, setCtaTitle] = useState('');
@@ -241,22 +240,6 @@ const GestionDomaines = ({ triggerToast, triggerConfirm }) => {
             </div>
           </div>
 
-          <div className="form-group mb-4">
-            <label>Références clients</label>
-            <ul className="draggable-list mb-2">
-              {domaines[key].references.map((r, i) => (
-                <li key={i} className="draggable-item" style={{ cursor: 'default' }}>
-                  <div className="draggable-item-content">{r}</div>
-                  <button className="admin-btn admin-btn-danger" style={{ padding: '4px 8px', fontSize: '0.8rem' }} onClick={() => removeFromList(key, 'references', i)}>✕</button>
-                </li>
-              ))}
-            </ul>
-            <div className="admin-input-grid" style={{ gridTemplateColumns: '1fr auto', alignItems: 'end' }}>
-              <input type="text" value={newRef} onChange={e => setNewRef(e.target.value)} placeholder="Ex: PAPSEN — Audit de conformité…" />
-              <button className="admin-btn admin-btn-primary" style={{ marginLeft: '8px' }} onClick={() => { addToList(key, 'references', newRef); setNewRef(''); }}>＋</button>
-            </div>
-          </div>
-
           <div className="form-actions-bar">
             <button className="admin-btn admin-btn-secondary" onClick={() => saveDomaine(key)}>
               💾 Enregistrer Domaine {key.replace('domaine', '')}
@@ -340,21 +323,6 @@ const GestionDomaines = ({ triggerToast, triggerConfirm }) => {
             <button className="admin-btn admin-btn-primary" style={{ marginLeft: '8px' }} onClick={() => { addToList('domaine4', 'themes', newTheme); setNewTheme(''); }}>＋</button>
           </div>
 
-          <div className="form-group mt-4 mb-4">
-            <label>Références clients</label>
-            <ul className="draggable-list mb-2">
-              {domaines.domaine4.references.map((r, i) => (
-                <li key={i} className="draggable-item" style={{ cursor: 'default' }}>
-                  <div className="draggable-item-content">{r}</div>
-                  <button className="admin-btn admin-btn-danger" style={{ padding: '4px 8px', fontSize: '0.8rem' }} onClick={() => removeFromList('domaine4', 'references', i)}>✕</button>
-                </li>
-              ))}
-            </ul>
-            <div className="admin-input-grid" style={{ gridTemplateColumns: '1fr auto', alignItems: 'end' }}>
-              <input type="text" value={newRef} onChange={e => setNewRef(e.target.value)} placeholder="Ex: DP World — Formation Informatique…" />
-              <button className="admin-btn admin-btn-primary" style={{ marginLeft: '8px' }} onClick={() => { addToList('domaine4', 'references', newRef); setNewRef(''); }}>＋</button>
-            </div>
-          </div>
 
           <div className="form-actions-bar">
             <button className="admin-btn admin-btn-secondary" onClick={() => saveDomaine('domaine4')}>

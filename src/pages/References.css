@@ -140,3 +140,61 @@
   color: #666666;
   font-size: 1.1rem;
 }
+.domaine-refs-section {
+  background: #F8FAFC;
+  border-top: 1px solid #E5E7EB;
+}
+
+.domaine-refs-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 28px;
+}
+
+@media (min-width: 640px) {
+  .domaine-refs-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.domaine-ref-block {
+  background: var(--blanc);
+  border: 1px solid #E5E7EB;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 2px 8px rgba(26, 36, 86, 0.04);
+}
+
+.domaine-ref-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--bleu-marine);
+  margin-bottom: 14px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid var(--or);
+  display: inline-block;
+}
+
+.domaine-ref-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.domaine-ref-list li {
+  font-size: 0.9rem;
+  color: var(--texte-fonce);
+  line-height: 1.5;
+  padding-left: 14px;
+  position: relative;
+}
+
+.domaine-ref-list li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  color: var(--or);
+}

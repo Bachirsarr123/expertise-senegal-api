@@ -8,10 +8,11 @@ const apiClient = axios.create({ baseURL: API, timeout: 8000 });
 
 const References = () => {
   const [references, setReferences] = useState([]);
+  const [domaines, setDomaines] = useState({});
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchReferences();
+    Promise.all([fetchReferences(), fetchDomaineRefs()]).finally(() => setLoading(false));
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, []);
 
@@ -21,35 +22,55 @@ const References = () => {
       setReferences(data);
     } catch (err) {
       console.warn('Could not load references.');
-    } finally {
-      setLoading(false);
     }
   };
+
+  const fetchDomaineRefs = async () => {
+    try {
+      const { data } = await apiClient.get('/api/content/all');
+      if (data.domaines) {
+        const parsed = {};
+        ['domaine1', 'domaine2', 'domaine3', 'domaine4'].forEach(key => {
+          const d = data.domaines[key];
+          if (!d) return;
+          let refs = d.references;
+          if (typeof refs === 'string') { try { refs = JSON.parse(refs); } catch { refs = []; } }
+          parsed[key] = { title: d.title || d.label || key, references: Array.isArray(refs) ? refs : [] };
+        });
+        setDomaines(parsed);
+      }
+    } catch (err) {
+      console.warn('Could not load domain references.');
+    }
+  };
+
+  const domainesWithRefs = ['domaine1', 'domaine2', 'domaine3', 'domaine4']
+    .filter(key => domaines[key] && domaines[key].references.length > 0);
 
   return (
     <div className="references-page">
       <SEO
-        title="Nos References - Expertise Senegal"
-        description="Decouvrez les institutions et entreprises qui font confiance a Expertise Senegal pour leurs missions de conseil, formation et etudes."
+        title="Nos RÃ©fÃ©rences â€” Expertise SÃ©nÃ©gal | Dakar, SÃ©nÃ©gal"
+        description="DÃ©couvrez les institutions et entreprises qui font confiance Ã  Expertise SÃ©nÃ©gal pour leurs missions de conseil, formation et Ã©tudes."
         url="https://www.expertisesenegal.com/references"
       />
 
       <section className="references-hero">
         <div className="references-hero-overlay"></div>
         <div className="container references-hero-content">
-          <div className="references-hero-badge">NOS REFERENCES - EXPERTISE SENEGAL</div>
-          <h1>Nos References Clients</h1>
-          <p>Des institutions publiques, entreprises et organisations qui nous font confiance depuis 2016.</p>
+          <div className="references-hero-badge">NOS RÃ‰FÃ‰RENCES â€” EXPERTISE SÃ‰NÃ‰GAL</div>
+          <h1>Nos RÃ©fÃ©rences Clients</h1>
+          <p>Des institutions publiques, entreprises privÃ©es et organisations qui nous font confiance depuis 2016.</p>
         </div>
       </section>
 
       <section className="references-grid-section section-padding">
         <div className="container">
           {loading ? (
-            <div className="ref-loading">Chargement des references...</div>
+            <div className="ref-loading">Chargement des rÃ©fÃ©rences...</div>
           ) : references.length === 0 ? (
             <div className="ref-empty">
-              <p>Aucune reference disponible pour le moment.</p>
+              <p>Aucune rÃ©fÃ©rence disponible pour le moment.</p>
             </div>
           ) : (
             <div className="references-grid">
@@ -74,6 +95,26 @@ const References = () => {
           )}
         </div>
       </section>
+
+      {!loading && domainesWithRefs.length > 0 && (
+        <section className="domaine-refs-section section-padding">
+          <div className="container">
+            <h2 className="section-title text-center mb-5">RÃ©fÃ©rences par domaine d'activitÃ©</h2>
+            <div className="domaine-refs-grid">
+              {domainesWithRefs.map(key => (
+                <div key={key} className="domaine-ref-block">
+                  <h3 className="domaine-ref-title">{domaines[key].title}</h3>
+                  <ul className="domaine-ref-list">
+                    {domaines[key].references.map((ref, i) => (
+                      <li key={i} dangerouslySetInnerHTML={{ __html: ref.replace(/^([^â€”]+)â€”/, '<strong>$1</strong>â€”') }} />
+                    ))}
+                  </ul>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
     </div>
   );
 };

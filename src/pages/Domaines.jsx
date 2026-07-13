@@ -134,16 +134,7 @@ const Domaines = () => {
             )}
           </div>
 
-          <div className="domaine-ref-col layout-40">
-            <div className={`ref-card ${isDark ? 'dark-mode' : ''}`}>
-              <h3 className={`ref-title ${isDark ? 'text-white' : ''}`}>Références liées :</h3>
-              <ul className={`ref-list ${isDark ? 'text-white-opacity' : ''}`}>
-                {dom.references.map((ref, i) => (
-                  <li key={i} dangerouslySetInnerHTML={{ __html: ref.replace(/^([^—]+)—/, '<strong>$1</strong>—') }} />
-                ))}
-              </ul>
-            </div>
-          </div>
+          
         </div>
       </section>
     );

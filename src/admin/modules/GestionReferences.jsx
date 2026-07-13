@@ -11,19 +11,47 @@ const GestionReferences = ({ triggerToast, triggerConfirm }) => {
   const [uploadingLogo, setUploadingLogo] = useState(false);
   const [saving, setSaving] = useState(false);
 
+  const [domaines, setDomaines] = useState({
+    domaine1: { title: 'Domaine 1', references: [] },
+    domaine2: { title: 'Domaine 2', references: [] },
+    domaine3: { title: 'Domaine 3', references: [] },
+    domaine4: { title: 'Domaine 4', references: [] }
+  });
+  const [newDomRef, setNewDomRef] = useState('');
+  const [savingDom, setSavingDom] = useState('');
+
   useEffect(() => {
-    fetchReferences();
+    Promise.all([fetchReferences(), fetchDomaines()]).finally(() => setLoading(false));
   }, []);
 
   const fetchReferences = async () => {
-    setLoading(true);
     try {
       const { data } = await axiosInstance.get('/api/references');
       setReferences(data);
     } catch {
-      triggerToast('Impossible de charger les references.', 'error');
-    } finally {
-      setLoading(false);
+      triggerToast('Impossible de charger les rÃ©fÃ©rences.', 'error');
+    }
+  };
+
+  const fetchDomaines = async () => {
+    try {
+      const { data } = await axiosInstance.get('/api/content/all');
+      if (data.domaines) {
+        const updated = {};
+        ['domaine1', 'domaine2', 'domaine3', 'domaine4'].forEach(key => {
+          const d = data.domaines[key];
+          if (!d) return;
+          let refs = d.references;
+          if (typeof refs === 'string') { try { refs = JSON.parse(refs); } catch { refs = []; } }
+          updated[key] = {
+            title: d.title || d.label || `Domaine ${key.replace('domaine', '')}`,
+            references: Array.isArray(refs) ? refs : []
+          };
+        });
+        setDomaines(prev => ({ ...prev, ...updated }));
+      }
+    } catch {
+      triggerToast('Impossible de charger les domaines.', 'error');
     }
   };
 
@@ -37,10 +65,10 @@ const GestionReferences = ({ triggerToast, triggerConfirm }) => {
       const { data } = await axiosInstance.post('/api/media/upload', formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
-      setLogoUrl(data.chemin || data.url || '');
-      triggerToast('Logo televerse.');
+      setLogoUrl(data.chemin || data.url);
+      triggerToast('Logo tÃ©lÃ©versÃ©.');
     } catch {
-      triggerToast('Erreur lors du telechargement.', 'error');
+      triggerToast('Erreur lors du tÃ©lÃ©versement.', 'error');
     } finally {
       setUploadingLogo(false);
       e.target.value = '';
@@ -53,7 +81,7 @@ const GestionReferences = ({ triggerToast, triggerConfirm }) => {
     setSaving(true);
     try {
       await axiosInstance.post('/api/references', { nom, secteur, logo_url: logoUrl, ordre });
-      triggerToast('Reference ajoutee.');
+      triggerToast('RÃ©fÃ©rence ajoutÃ©e.');
       setNom(''); setSecteur(''); setLogoUrl(''); setOrdre('');
       fetchReferences();
     } catch {
@@ -64,10 +92,10 @@ const GestionReferences = ({ triggerToast, triggerConfirm }) => {
   };
 
   const handleDelete = (id, nomRef) => {
-    triggerConfirm('Supprimer la reference "' + nomRef + '" ?', async () => {
+    triggerConfirm('Supprimer la rÃ©fÃ©rence "' + nomRef + '" ?', async () => {
       try {
         await axiosInstance.delete('/api/references/' + id);
-        triggerToast('Reference supprimee.');
+        triggerToast('RÃ©fÃ©rence supprimÃ©e.');
         fetchReferences();
       } catch {
         triggerToast('Erreur lors de la suppression.', 'error');
@@ -75,12 +103,46 @@ const GestionReferences = ({ triggerToast, triggerConfirm }) => {
     });
   };
 
-  if (loading) return <div className="loading-spinner">Chargement des references...</div>;
+  const addDomaineRef = (key, val) => {
+    if (!val.trim()) return;
+    setDomaines(prev => ({
+      ...prev,
+      [key]: { ...prev[key], references: [...prev[key].references, val.trim()] }
+    }));
+    setNewDomRef('');
+  };
+
+  const removeDomaineRef = (key, idx) => {
+    setDomaines(prev => ({
+      ...prev,
+      [key]: { ...prev[key], references: prev[key].references.filter((_, i) => i !== idx) }
+    }));
+  };
+
+  const saveDomaineRefs = async (key) => {
+    setSavingDom(key);
+    try {
+      await axiosInstance.post('/api/content/save', {
+        contents: [
+          { page: 'domaines', section: key, cle: 'references', valeur: JSON.stringify(domaines[key].references), type: 'texte' }
+        ]
+      });
+      triggerToast('RÃ©fÃ©rences ' + domaines[key].title + ' enregistrÃ©es.');
+    } catch {
+      triggerToast('Erreur lors de la sauvegarde.', 'error');
+    } finally {
+      setSavingDom('');
+    }
+  };
+
+  if (loading) return <div className="loading-spinner">Chargement des rÃ©fÃ©rences...</div>;
 
   return (
     <div className="gestion-references-module">
+
+      {/* â”€â”€ RÃ©fÃ©rences clients (logos) â”€â”€ */}
       <div className="admin-card" style={{ marginBottom: '28px' }}>
-        <h2 className="admin-card-title">Ajouter une reference client</h2>
+        <h2 className="admin-card-title">âž• Ajouter une rÃ©fÃ©rence client</h2>
         <form onSubmit={handleAdd} className="admin-form">
           <div className="admin-input-grid mb-4" style={{ gridTemplateColumns: '1fr 1fr' }}>
             <div className="form-group">
@@ -94,12 +156,12 @@ const GestionReferences = ({ triggerToast, triggerConfirm }) => {
               />
             </div>
             <div className="form-group">
-              <label>Secteur d'activite</label>
+              <label>Secteur d'activitÃ©</label>
               <input
                 type="text"
                 value={secteur}
                 onChange={e => setSecteur(e.target.value)}
-                placeholder="ex: Agriculture, Energie, Finance publique..."
+                placeholder="ex: Agriculture, Ã‰nergie, Finance publique..."
               />
             </div>
           </div>
@@ -114,12 +176,12 @@ const GestionReferences = ({ triggerToast, triggerConfirm }) => {
                 cursor: uploadingLogo ? 'not-allowed' : 'pointer', fontSize: '0.9rem'
               }}>
                 <input type="file" accept="image/*" onChange={handleLogoUpload} style={{ display: 'none' }} disabled={uploadingLogo} />
-                {uploadingLogo ? 'Telechargement...' : 'Choisir un logo'}
+                {uploadingLogo ? 'â³ TÃ©lÃ©versement...' : 'ðŸ–¼ï¸ Choisir un logo'}
               </label>
               {logoUrl && (
                 <div style={{ marginTop: '8px', display: 'flex', alignItems: 'center', gap: '8px' }}>
                   <img src={logoUrl} alt="logo" style={{ height: '40px', objectFit: 'contain', borderRadius: '4px', border: '1px solid #E5E7EB' }} />
-                  <button type="button" onClick={() => setLogoUrl('')} style={{ background: 'none', border: 'none', color: '#EF4444', cursor: 'pointer' }}>X</button>
+                  <button type="button" onClick={() => setLogoUrl('')} style={{ background: 'none', border: 'none', color: '#EF4444', cursor: 'pointer' }}>âœ•</button>
                 </div>
               )}
             </div>
@@ -129,7 +191,7 @@ const GestionReferences = ({ triggerToast, triggerConfirm }) => {
                 type="number"
                 value={ordre}
                 onChange={e => setOrdre(e.target.value)}
-                placeholder="1, 2, 3... (0 = defaut)"
+                placeholder="1, 2, 3... (0 = dÃ©faut)"
                 style={{ maxWidth: '180px' }}
               />
             </div>
@@ -137,17 +199,17 @@ const GestionReferences = ({ triggerToast, triggerConfirm }) => {
 
           <div className="form-actions-bar" style={{ borderTop: '1px solid #E5E7EB', paddingTop: '16px' }}>
             <button type="submit" className="admin-btn admin-btn-secondary" disabled={saving}>
-              {saving ? 'Enregistrement...' : 'Ajouter la reference'}
+              {saving ? 'â³ Enregistrement...' : 'ðŸ’¾ Ajouter la rÃ©fÃ©rence'}
             </button>
           </div>
         </form>
       </div>
 
-      <div className="admin-card">
-        <h2 className="admin-card-title">References clients ({references.length})</h2>
+      <div className="admin-card" style={{ marginBottom: '28px' }}>
+        <h2 className="admin-card-title">ðŸ“‹ RÃ©fÃ©rences clients ({references.length})</h2>
         {references.length === 0 ? (
           <p style={{ textAlign: 'center', color: 'var(--texte-moyen)', padding: '30px 0' }}>
-            Aucune reference pour le moment.
+            Aucune rÃ©fÃ©rence pour le moment. Ajoutez votre premiÃ¨re rÃ©fÃ©rence ci-dessus.
           </p>
         ) : (
           <div className="admin-table-container">
@@ -178,7 +240,7 @@ const GestionReferences = ({ triggerToast, triggerConfirm }) => {
                       )}
                     </td>
                     <td style={{ fontWeight: 600, color: 'var(--bleu-marine)' }}>{ref.nom}</td>
-                    <td style={{ color: 'var(--texte-moyen)', fontSize: '0.88rem' }}>{ref.secteur || '-'}</td>
+                    <td style={{ color: 'var(--texte-moyen)', fontSize: '0.88rem' }}>{ref.secteur || 'â€”'}</td>
                     <td>{ref.ordre || 0}</td>
                     <td>
                       <button
@@ -186,7 +248,7 @@ const GestionReferences = ({ triggerToast, triggerConfirm }) => {
                         style={{ padding: '6px 10px', fontSize: '0.8rem' }}
                         onClick={() => handleDelete(ref.id, ref.nom)}
                       >
-                        Supprimer
+                        ðŸ—‘ï¸ Supprimer
                       </button>
                     </td>
                   </tr>
@@ -196,6 +258,57 @@ const GestionReferences = ({ triggerToast, triggerConfirm }) => {
           </div>
         )}
       </div>
+
+      {/* â”€â”€ RÃ©fÃ©rences par domaine d'activitÃ© â”€â”€ */}
+      <div className="admin-card">
+        <h2 className="admin-card-title">ðŸ“Œ RÃ©fÃ©rences par domaine d'activitÃ©</h2>
+        <p style={{ fontSize: '0.85rem', color: '#6B7280', marginBottom: '20px' }}>
+          Ces rÃ©fÃ©rences texte s'affichent sur la page "Nos RÃ©fÃ©rences" (section par domaine).
+        </p>
+        {['domaine1', 'domaine2', 'domaine3', 'domaine4'].map(key => (
+          <div key={key} style={{ border: '1px solid #E5E7EB', borderRadius: '8px', padding: '16px', marginBottom: '16px' }}>
+            <h3 style={{ fontSize: '1rem', fontWeight: 600, color: 'var(--bleu-marine)', marginBottom: '12px' }}>
+              {domaines[key].title}
+            </h3>
+            <ul className="draggable-list mb-2">
+              {domaines[key].references.length === 0 ? (
+                <li style={{ color: '#9CA3AF', fontSize: '0.85rem', padding: '6px 0', listStyle: 'none' }}>Aucune rÃ©fÃ©rence pour ce domaine.</li>
+              ) : domaines[key].references.map((r, i) => (
+                <li key={i} className="draggable-item" style={{ cursor: 'default' }}>
+                  <div className="draggable-item-content">{r}</div>
+                  <button
+                    className="admin-btn admin-btn-danger"
+                    style={{ padding: '4px 8px', fontSize: '0.8rem' }}
+                    onClick={() => removeDomaineRef(key, i)}
+                  >âœ•</button>
+                </li>
+              ))}
+            </ul>
+            <div className="admin-input-grid mb-3" style={{ gridTemplateColumns: '1fr auto', alignItems: 'end' }}>
+              <input
+                type="text"
+                value={newDomRef}
+                onChange={e => setNewDomRef(e.target.value)}
+                placeholder="Ex: PAPSEN â€” Audit de conformitÃ©â€¦"
+                onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); addDomaineRef(key, newDomRef); } }}
+              />
+              <button
+                className="admin-btn admin-btn-primary"
+                style={{ marginLeft: '8px' }}
+                onClick={() => addDomaineRef(key, newDomRef)}
+              >ï¼‹</button>
+            </div>
+            <button
+              className="admin-btn admin-btn-secondary"
+              disabled={savingDom === key}
+              onClick={() => saveDomaineRefs(key)}
+            >
+              {savingDom === key ? 'â³ Enregistrement...' : 'ðŸ’¾ Enregistrer'}
+            </button>
+          </div>
+        ))}
+      </div>
+
     </div>
   );
 };
