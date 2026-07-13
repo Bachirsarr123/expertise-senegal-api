@@ -1,4 +1,4 @@
-﻿import { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import logoImg from '../assets/logo.png';
 import './Dashboard.css';
@@ -146,6 +146,13 @@ const Dashboard = () => {
             onClick={() => setActiveTab('domaines')}
           >
             <span className="nav-icon">🗂️</span> Domaines d'Activité
+          </button>
+
+          <button 
+            className={`nav-item-btn ${activeTab === 'references' ? 'active' : ''}`}
+            onClick={() => setActiveTab('references')}
+          >
+            <span className="nav-icon">⭐</span> Nos Références
           </button>
 
           <button 
