@@ -18,6 +18,7 @@ const SeminaireDetail = () => {
   const [message, setMessage] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [successMsg, setSuccessMsg] = useState('');
+  const [showPreview, setShowPreview] = useState(false);
 
   useEffect(() => { fetchDetail(); window.scrollTo({ top: 0, behavior: 'smooth' }); }, [id]);
 
@@ -176,12 +177,12 @@ const SeminaireDetail = () => {
                     </div>
                     {!pub.document_url.toLowerCase().includes('.doc') && (
                       <div className="pub-pdf-viewer">
-                        <iframe
+                        {showPreview ? (<iframe
                           src={pub.document_url}
                           title="Apercu du document"
                           className="pdf-iframe"
                           frameBorder="0"
-                        />
+                        />) : (<button type="button" className="btn btn-outline-preview" onClick={() => setShowPreview(true)}>👁 Afficher l'apercu du document</button>)}
                       </div>
                     )}
                   </div>

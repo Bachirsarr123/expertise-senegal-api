@@ -349,3 +349,22 @@
   width: 100%;
   max-width: 100%;
 }
+
+.btn-outline-preview {
+  display: block;
+  width: 100%;
+  padding: 18px;
+  background: #F8FAFF;
+  border: 2px dashed #C7D2FE;
+  border-radius: 8px;
+  color: var(--bleu-marine);
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.2s ease;
+}
+.btn-outline-preview:hover {
+  background: #EEF2FF;
+  border-color: var(--bleu-marine);
+}
