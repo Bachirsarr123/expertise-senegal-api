@@ -152,11 +152,13 @@ router.get('/download', async (req, res) => {
     const signPath = '/' + pathParts.join('/');
     // e.g. /expertise-senegal/documents/attesation_1783686092352.pdf
 
-    // Cloudinary signature: SHA256(path + api_secret) -> base64url -> first 8 chars
-    const rawHash = crypto.createHash('sha256')
-      .update(signPath + config.api_secret)
-      .digest('base64url');
-    const sig = rawHash.substring(0, 8);
+    // Cloudinary URL signing: SHA1(publicId_no_leading_slash + api_secret) -> base64 URL-safe -> first 8 chars
+    const toSign = pathParts.join('/') + config.api_secret;
+    const sig = crypto.createHash('sha1')
+      .update(toSign)
+      .digest('base64')
+      .replace(/[+]/g, '-').replace(/[/]/g, '_').replace(/=/g, '')
+      .substring(0, 8);
 
     const signedUrl = 'https://res.cloudinary.com/' + config.cloud_name + '/raw/upload/s--' + sig + '--' + signPath;
     console.log('[download] signedUrl:', signedUrl);
