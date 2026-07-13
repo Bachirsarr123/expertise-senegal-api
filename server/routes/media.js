@@ -143,24 +143,21 @@ router.get('/download', async (req, res) => {
     const { Readable } = require('stream');
     const config = cloudinary.config();
 
-    // Extract path after /upload/, strip version prefix
+    // Cloudinary URL signing: SHA1(afterUpload + api_secret) -> base64url -> 8 chars
+    // afterUpload includes version (e.g. v1783686092/folder/file.pdf) - required for signing
     const uploadMarker = '/upload/';
     const uploadIdx = fileUrl.indexOf(uploadMarker);
     const afterUpload = fileUrl.substring(uploadIdx + uploadMarker.length);
-    const parts = afterUpload.split('/');
-    const pathParts = /^v[0-9]+$/.test(parts[0]) ? parts.slice(1) : parts;
-    const signPath = '/' + pathParts.join('/');
-    // e.g. /expertise-senegal/documents/attesation_1783686092352.pdf
+    const filename = decodeURIComponent(afterUpload.split('/').pop()) || 'document.pdf';
 
-    // Cloudinary URL signing: SHA1(publicId_no_leading_slash + api_secret) -> base64 URL-safe -> first 8 chars
-    const toSign = pathParts.join('/') + config.api_secret;
+    const toSign = afterUpload + config.api_secret;
     const sig = crypto.createHash('sha1')
       .update(toSign)
       .digest('base64')
       .replace(/[+]/g, '-').replace(/[/]/g, '_').replace(/=/g, '')
       .substring(0, 8);
 
-    const signedUrl = 'https://res.cloudinary.com/' + config.cloud_name + '/raw/upload/s--' + sig + '--' + signPath;
+    const signedUrl = fileUrl.substring(0, uploadIdx + uploadMarker.length) + 's--' + sig + '--/' + afterUpload;
     console.log('[download] signedUrl:', signedUrl);
 
     const response = await fetch(signedUrl);
@@ -170,7 +167,7 @@ router.get('/download', async (req, res) => {
       return res.status(response.status).json({ message: 'Cloudinary ' + response.status });
     }
 
-    const filename = decodeURIComponent(pathParts[pathParts.length - 1]) || 'document.pdf';
+
     res.setHeader('Content-Disposition', 'attachment; filename="' + filename + '"');
     res.setHeader('Content-Type', 'application/pdf');
     res.setHeader('Access-Control-Allow-Origin', '*');
