@@ -130,4 +130,32 @@ router.post('/upload-document', authMiddleware, uploadDoc.single('document'), as
     res.status(500).json({ message: 'Erreur upload: ' + error.message });
   }
 });
+
+// GET download proxy - streams file with forced download headers (bypasses CORS)
+router.get('/download', (req, res) => {
+  const fileUrl = req.query.url;
+  if (!fileUrl) return res.status(400).json({ message: 'URL manquante.' });
+
+  const https = require('https');
+  const http = require('http');
+  const filename = decodeURIComponent(fileUrl.split('/').pop().split('?')[0]) || 'document.pdf';
+  const isPdf = filename.toLowerCase().endsWith('.pdf');
+  const contentType = isPdf ? 'application/pdf' : 'application/octet-stream';
+
+  const protocol = fileUrl.startsWith('https') ? https : http;
+  const proxyReq = protocol.get(fileUrl, (fileRes) => {
+    if (fileRes.statusCode !== 200) {
+      return res.status(404).json({ message: 'Fichier non trouve.' });
+    }
+    res.setHeader('Content-Disposition', 'attachment; filename="' + filename + '"');
+    res.setHeader('Content-Type', contentType);
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    fileRes.pipe(res);
+  });
+  proxyReq.on('error', (err) => {
+    console.error('Download proxy error:', err);
+    if (!res.headersSent) res.status(500).json({ message: 'Erreur lors du telechargement.' });
+  });
+});
+
 module.exports = router;
